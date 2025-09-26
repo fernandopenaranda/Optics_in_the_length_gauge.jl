@@ -4,7 +4,7 @@
 """ ωlist in meV 
 ωlist, conds = σab_inter_linear(:x, :x, p, collect(0:1:20), evals = 4000);
     plot_linear_conductivity(ωlist, conds, :x,:x, part = :real) """
-function σab_inter_linear(a, b, p::ParamsHF, ωlist; save = false, η = 0.1, evals = 10000, part = :real, kws...)
+function σab_inter_linear(a, b, p::ParamsHF, ωlist; η = 0.1, evals = 10000, part = :real, kws...)
     conds = zeros(Float64, length(ωlist))
     println(evals)
     half_dim = length(ωlist)÷2
@@ -33,22 +33,6 @@ function integral_linear(ωlist::Array, a, b, p, η, evals, part)
     return bz_integration(integrand, p, ωlist, evals)
 end
 
-# function bz_integration(f, p, ωlist, evals) #BUENA UNCOMMENT COMO EN EL PAPER
-#     M, xmin, xmax = int_boundaries(p)
-#     val, err = hcubature(length(ωlist), (x,v) -> v[:] = f(x), 
-#         [-xmax[1]/4, xmin[2]], [xmax[1]/2 - xmax[1]/4, xmax[2]]; reltol = 1e-5, abstol=0, maxevals=evals);
-#     bz_surface  =  (1/(2pi*a0))^2 
-#     return bz_surface .* val
-# end
-
-# function bz_integration(f, p, evals)
-#     M, xmin, xmax = int_boundaries(p)
-#     val, err = hcubature(length(ωlist), (x,v) -> v[:] = f(x), 
-#         [0, xmin[2]], [xmax[1]/2, xmax[2]]; reltol = 1e-5, abstol=0, maxevals=evals);
-#     bz_surface  =  (1/(2pi*a0))^2 
-#     return bz_surface .* val
-# end
-
 function bz_integration(f, p, ωlist, evals) 
     M, xmin, xmax = int_boundaries(p)
     val, err = Cubature.hcubature(length(ωlist), (x,v) -> v[:] = f(x), 
@@ -57,7 +41,6 @@ function bz_integration(f, p, ωlist, evals)
     return bz_surface .* val
 end
 
-
 function bz_grid_integration(f, p, ωlist, evals)
     M, xmin, xmax = int_boundaries(p)
     xm = -xmax[1]/4 
@@ -65,7 +48,7 @@ function bz_grid_integration(f, p, ωlist, evals)
     xp = xmax[1]/2 - xmax[1]/4 
     yp =  xmax[2]
     vals = zeros(length(ωlist))
-    for o in 1:length( ωlist )
+    for o in 1:length(ωlist)
         for i in 0:evals
             for j in 0:evals
                 qx = xm + i/evals * (xp-xm)

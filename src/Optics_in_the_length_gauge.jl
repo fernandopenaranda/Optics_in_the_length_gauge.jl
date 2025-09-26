@@ -18,6 +18,7 @@ module Optics_in_the_length_gauge
     const ħ_ev_s = (ħ |> u"eV*s").val
     
     include("optics_operators.jl")
+    include("integration.jl")
     include("jdos.jl")
     include("linear_conductivity.jl")
     

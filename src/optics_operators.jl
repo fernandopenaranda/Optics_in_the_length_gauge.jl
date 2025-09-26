@@ -18,14 +18,12 @@ function r_covariant(omega, ra, Δa, rb, Δb)                                   
                 aux = 0
                 for p in 1:dim
                     if p != n && p != m
-                        aux += 1im * (omega[n,p]*ra[n,p]*rb[p,m] - omega[p,m]*rb[n,p]*ra[p,m])
-                        # Units: eV * Å * Å  # WARN DIVISIONS BY DIFFERENT OMEGAnm
+                        aux += 1im * (omega[n,p]*ra[n,p]*rb[p,m] - omega[p,m]*rb[n,p]*ra[p,m]) # Units: eV * Å * Å 
                     else
                         aux += 0
                     end
                 end
-                raa_cov[n,m] = -((ra[n,m] * Δb[n,m] + rb[n,m] * Δa[n,m]) + aux)/omega[n,m]
-                # Units: (Å * Å * eV) / eV
+                raa_cov[n,m] = -((ra[n,m] * Δb[n,m] + rb[n,m] * Δa[n,m]) + aux)/omega[n,m] # Units: (Å * Å * eV) / eV
             else 
                 nothing
             end
@@ -65,7 +63,8 @@ end
 lorentz(ϵs, ω, η) = 1/π .* η ./ (δ(ϵs, ω).^2 .+ η^2) 
 δ(ϵs, ω) = ω .- Ω(ϵs)  # the minus sign comes from delta(e_f-e_i-omega); ωnm = -ωmn
 # this definition is weak against degeneracies but it is highly efficient (benchmark)
-Ω(ϵs) = ϵs .- t(ϵs) +  1e-7 * Diagonal(ϵs) .+ 1e-35# the last term is just to avoid infinities it'll cancel out later
+Ω(ϵs) = ϵs .- t(ϵs) +  1e-7 * Diagonal(ϵs) .+ 1e-35# the last term is just to avoid infinities 
+#it'll cancel out later
 # Δ(ψs, dh) = vel(ψs, dh) - t(vel(ψs, dh))
 vel(ψs, dh) = ψs' * dh * ψs # It really is hbar v  # Units: meV Å  
 
@@ -96,7 +95,6 @@ end
 fn - fm where f are the Fermi Dirac distribution in the limit of T = 0.
 I set p.
 """
-
 function f!(mat, ϵs, μ, T, tol = 1e10) 
     replace!(mat, NaN => tol, NaN + NaN*im => tol *(1+im), 1im * NaN => tol*1im )
     mat .*= f(ϵs, μ, T)
@@ -132,7 +130,6 @@ function whichBPGE(part, r_cov, r)
     end
 end
 
-
 symmetrized_imagsum(mat1, mat2)  =  imag(mat1 .* t(mat2) .+ mat2 .* t(mat1))
 symmetrized_imagsum(mat1, mat2, mat3, mat4) = imag((mat1 .* t(mat2)) .+ (mat3 .* t(mat4))) 
 
@@ -162,141 +159,3 @@ function return_kwargs(kws, name::Symbol)
     else  nothing
     end
 end
-
-#_________________________________________________________________________________________
-# Derivatives and geometry
-#_________________________________________________________________________________________
-
-function dhs(a, b, p)                                                                       
-    unbounded = (:x, :y)
-    if !(a ∈ unbounded && b ∈ unbounded)
-        throw(ArgumentError("Only linear photocurrents with unbounded cartesian indices are implemented"))
-    end
-    dha =  dhf_hamiltonian(p, a)
-    if a == b
-        return dha, dha
-    else
-        dhb =  dhf_hamiltonian(p, b)
-        return dha, dhb
-    end
-end
-
-function dhs(a, b, k, p)                                                                       
-    unbounded = (:x, :y)
-    if !(a ∈ unbounded && b ∈ unbounded)
-        throw(ArgumentError("Only linear photocurrents with unbounded cartesian indices are implemented"))
-    end
-    dha =  dhf_hamiltonian(p, k, a)
-    if a == b
-        return dha, dha
-    else
-        dhb =  dhf_hamiltonian(p, k, b)
-        return dha, dhb
-    end
-end
-
-
-"""
-boundaries of the integration function for the HF model (same as for the BM model)
-"""
-function int_boundaries(p::ParamsHF)
-    G1, G2 = bravais_vectors(p)
-    M = m(G1, G2)
-    v_length = norm(G2 - G1)
-    h_length = norm(G2 + G1)
-    κ1 = κ(G1, G2)
-    return M, [0, -v_length/2], [2M[1], v_length/2 ]
-end
-
-# # ------------------------------------------------------------------------------------------
-# # JOINT DOS
-# # ------------------
-# function jdos(p, ωmin, ωmax, step)
-#     ωlist = collect(ωmin:step:ωmax)
-#     return [integral_jdos(ω, p) for ω in ωlist]
-# end
-
-# function integral_jdos(ω, p)
-#     v_length, h_length, xmin, xmax = int_boundaries(p)    
-#     integrand(q) = jdos_integrand(ω, q, p, v_length, h_length)
-#     val, err = hcubature(integrand, xmin, xmax; reltol=1e-8, abstol=0, maxevals=200)
-#     return val, err
-# end
-
-# function jdos_integrand(ω, q, p, vl, hl)
-#     m = rec_vecs(p).M
-#     if shapeBZ(q, vl, hl, m)
-#         jdos_ω(ω, q, p)
-#     else
-#         0.0
-#     end
-# end
-
-# function jdos_ω(ω, q, p)
-#     h = bistritzer_hamiltonian(p, q)
-#     ϵs, _ = eigen(Matrix(h))
-#     Γ = 1e-4 #
-#     return sum(Γ ./ ((Ω(ϵs) .- ω).^2 .+ Γ.^2))
-# end
-
-# # ------------------------------------------------------------------------------------------
-# # DOS
-# # ------------------
-
-# function dos(p, ωmin, ωmax, step)
-#     ωlist = collect(ωmin:step:ωmax)
-#     return [integral_dos(ω, p) for ω in ωlist]
-# end
-
-# function integral_dos(ω, p)
-#     v_length, h_length, xmin, xmax = int_boundaries(p)    
-#     integrand(q) = dos_integrand(ω, q, p, v_length, h_length)
-#     val, err = hcubature(integrand, xmin, xmax; reltol=1e-8, abstol=0, maxevals=2000)
-#     return val, err
-# end
-
-# function dos_integrand(ω, q, p, vl, hl)
-#     m = rec_vecs(p).M
-#     if shapeBZ(q, vl, hl, m)
-#         dos_ω(ω, q, p)
-#     else
-#         0.0
-#     end
-# end
-
-# function dos_ω(ω, q, p)
-#     h = bistritzer_hamiltonian(p, q)
-#     ϵs, _ = eigen(Matrix(h))
-#     Γ = 1e-4 #
-#     return sum(Γ ./ ((ϵs .- ω).^2 .+ Γ.^2))
-# end
-
-
-# #######
-# function dos(p, ωmin, ωmax, step)
-#     ωlist = collect(ωmin:step:ωmax)
-#     return [integral_dos(ω, p) for ω in ωlist]
-# end
-
-# function integral_dos(ω, p)
-#     v_length, h_length, xmin, xmax = int_boundaries(p)    
-#     integrand(q) = dos_integrand(ω, q, p, v_length, h_length)
-#     val, err = hcubature(integrand, xmin, xmax; reltol=1e-8, abstol=0, maxevals=2000)
-#     return val, err
-# end
-
-# function dos_integrand(ω, q, p, vl, hl)
-#     m = rec_vecs(p).M
-#     if shapeBZ(q, vl, hl, m)
-#         dos_ω(ω, q, p)
-#     else
-#         0.0
-#     end
-# end
-
-# function dos_ω(ω, q, p)
-#     h = bistritzer_hamiltonian(p, q)
-#     ϵs, _ = eigen(Matrix(h))
-#     Γ = 1e-4 #
-#     return sum(Γ ./ ((ϵs .- ω).^2 .+ Γ.^2))
-# end

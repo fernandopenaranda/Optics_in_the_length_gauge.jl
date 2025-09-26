@@ -7,4 +7,7 @@ Given a k space Hamiltonian, $H(\vec k)$, it computes several optical responses 
     $\sigma_{ab}^{\text{abs}} = \frac{\pi e^2}{\hbar} \sum_{n,m} \omega f_{nm} r_{nm}^a r_{mn}^b \delta(\omega-\omega_{mn})$
     $a$ and $b$ denote spatial directions unbounded dimensions 
 + ...
+
 Input: $H(\vec k)$, $\vec \partial H(\vec k)/\partial \vec k$, and the boundaries of the BZ (the latter two in improved versions will be computed automatically).
+
+Comments: $\delta(\omega-\omega_{mn})$ is approximated by a Lorentzian broadened by $\Gamma$: $\frac{\Gamma}{(\omega-\omega_{mn})^2 + \Gamma^2}$

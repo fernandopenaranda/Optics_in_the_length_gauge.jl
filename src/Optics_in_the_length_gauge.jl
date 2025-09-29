@@ -30,5 +30,5 @@ module Optics_in_the_length_gauge
     # Presets
     include("presets/MLG_ham.jl")
     
-    export jdos, linear_optical_conductivity
+    export dos, jdos, linear_optical_conductivity
 end

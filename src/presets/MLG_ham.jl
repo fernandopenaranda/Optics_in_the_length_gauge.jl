@@ -4,6 +4,10 @@
 #
 #_________________________________________________________________________________________
 
+"""
+ Monolayer graphene Hamiltonian μ is the chemical potential in eV, ν = ±1 is the valley, q::Array,
+ is the momentum (in adimensional units).
+"""
 function MLG_hamiltonian(μ, ν, q)
     mat = spzeros(ComplexF64, 2, 2) 
     st = _sublattice_coupling(q, ν)

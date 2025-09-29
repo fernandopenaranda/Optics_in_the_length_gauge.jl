@@ -1,7 +1,6 @@
 """ ωlist in meV
 returns the interband linear optical conductivity
-    \vec{dh} is \vec{\partial} H(\vec k)/\partial \vec{k} 
-
+ vec{dh} is vec{partial} H(vec k)/partial vec{k} 
 usage: 
     `ωlist, conds = σab_inter_linear(:x, :x, p, collect(0:1:20), evals = 4000)`
 """

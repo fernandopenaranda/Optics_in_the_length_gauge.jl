@@ -17,4 +17,7 @@ Given a k space Hamiltonian, $H(\vec k)$, it computes several optical responses 
 
 Input: $H(\vec k)$, $\vec \partial H(\vec k)/\partial \vec k$, and the boundaries of the BZ (the latter two in improved versions will be computed automatically).
 
-Comments: $\delta(\omega-\omega_{mn})$ is approximated by a Lorentzian broadened by $\Gamma$: $\frac{\Gamma}{(\omega-\omega_{mn})^2 + \Gamma^2}$
+Comments: 
+
++ $\delta(\omega-\omega_{mn})$ is approximated by a Lorentzian broadened by $\Gamma$: $\frac{\Gamma}{(\omega-\omega_{mn})^2 + \Gamma^2}$
++ IMPORTANT, the adaptive integration in 2D assumes a rectangular grid, take this in mind when passing the bounds. Improvement needed.

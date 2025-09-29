@@ -1,6 +1,5 @@
-"""
-    `jdos(h, xbounds, ybounds, ωlist; kws...)`
-Computes the joint density of states, provided a Hamiltonian function with momentum dependence $h(\vec k)$,
+""" `jdos(h, xbounds, ybounds, ωlist; kws...)`
+Computes the joint density of states, provided a Hamiltonian function with momentum dependence h(\vec k),
 BZ bounds along the x (xbounds) and y (ybounds) direction.
 - `a` and `b` are the in-plane (:x, :y) directions.
 - `η` defines the energy broadening of the Lorentzian peaks.
@@ -19,5 +18,7 @@ function integral_jdos(ωlist::Array, h, xbounds, ybounds, η, evals)
     return bz_integration(integrand, xbounds, ybounds, ωlist, evals)
 end
 
-jdos_ω(ωlist::Array, h, q, η) = jdos_ω(ωlist, eigen(Matrix(h(q)))[1], q, η)
-jdos_ω(ωlist::Array, ϵs, η) = [sum_nondiag(-f(ϵs, 0, 0) .* lorentz(ϵs, ω, η)) for ω in ωlist]   
+function jdos_ω(ωlist::Array, h, q, η)
+    ϵs, = eigen(Matrix(h(q)))
+    return [sum_nondiag(-f(ϵs, 0, 0) .* lorentz(ϵs, ω, η)) for ω in ωlist]   
+end

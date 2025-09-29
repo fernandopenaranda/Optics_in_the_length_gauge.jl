@@ -1,6 +1,7 @@
 module Optics_in_the_length_gauge
 
     using Arpack
+    using LinearAlgebra
     using Cubature
     using ProgressMeter
     using Base.Threads
@@ -9,6 +10,10 @@ module Optics_in_the_length_gauge
     using PhysicalConstants
     using PhysicalConstants.CODATA2018
     using Unitful
+    using CairoMakie
+    using SparseArrays
+    using StaticArrays
+
 
     const k_B = (PhysicalConstants.CODATA2018.k_B |> u"eV/mK").val
     const ħ = PhysicalConstants.CODATA2018.ħ
@@ -21,7 +26,9 @@ module Optics_in_the_length_gauge
     include("integration.jl")
     include("jdos.jl")
     include("linear_conductivity.jl")
+
+    # Presets
+    include("presets/MLG_ham.jl")
     
     export jdos, linear_optical_conductivity
-
 end

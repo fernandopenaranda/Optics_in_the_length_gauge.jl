@@ -19,5 +19,6 @@ Input: $H(\vec k)$, $\vec \partial H(\vec k)/\partial \vec k$, and the boundarie
 
 Comments: 
 
++ Input units: $\omega$ in eV, BZ boundaries: adimensional (multiplied by $a_0$ the lattice constant)
 + $\delta(\omega-\omega_{mn})$ is approximated by a Lorentzian broadened by $\Gamma$: $\frac{\Gamma}{(\omega-\omega_{mn})^2 + \Gamma^2}$
 + IMPORTANT, the adaptive integration in 2D assumes a rectangular grid, take this in mind when passing the bounds. Improvement needed.

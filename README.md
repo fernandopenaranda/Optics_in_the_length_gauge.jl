@@ -4,13 +4,14 @@
 
 Given a k space Hamiltonian, $H(\vec k)$, it computes several optical responses in the length gauge:
 
++ Density of states
+
 + Joint density of states
-  + $\text{jdos}(\omega) = \omega f_{nm} \delta(\omega-\omega_{mn})$
-  + 2D implementation
+  + $\text{jdos}(\omega) = \sum_{nm} f_{nm} \delta(\omega-\omega_{mn})$
 
 + Linear optical response $\vec{J}_a = σ_{ab}(ω) \vec{J}_b$ (absortive)
    + $\sigma_{ab}^{\text{abs}}(\omega) = \frac{\pi e^2}{\hbar} \sum_{n,m} \omega f_{nm} r_{nm}^a r_{mn}^b \delta(\omega-\omega_{mn})$
-   + 2D implementation
+   + 2D implementation -> Generalize to unbounded 3D (trivial)
 
     where $a$ and $b$ denote spatial directions unbounded dimensions 
 + ...
@@ -21,4 +22,4 @@ Comments:
 
 + Input units: $\omega$ in eV, BZ boundaries: adimensional (multiplied by $a_0$ the lattice constant)
 + $\delta(\omega-\omega_{mn})$ is approximated by a Lorentzian broadened by $\Gamma$: $\frac{\Gamma}{(\omega-\omega_{mn})^2 + \Gamma^2}$
-+ IMPORTANT, the adaptive integration in 2D assumes a rectangular grid, take this in mind when passing the bounds. Improvement needed.
++ IMPORTANT, the adaptive integration in 2D assumes a rectangular BZ, take this in mind when passing the bounds `xbounds` and `ybounds`. Improvement needed.

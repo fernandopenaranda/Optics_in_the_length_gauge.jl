@@ -1,44 +1,32 @@
-#_________________________________________________________________________________________
-# 
-#                             MLG HAMILTONIAN
-#
-#_________________________________________________________________________________________
+
+const t = -2.46575 # hopping amplitude
+const δ1 = [1/2, √3/2]
+const δ2 = [1/2, -√3/2]
+const δ3 =  [-1,0]
+const δs = [δ1, δ2, δ3] #real space vectors connecting A and B sites
+const K1 = 2π/3 * [1, 1/√3] # K point
+const K2 = 2π/3 * [1,-1/√3] # K' point
 
 """
- Monolayer graphene Hamiltonian μ is the chemical potential in eV, ν = ±1 is the valley, q::Array,
- is the momentum (in adimensional units).
+ Monolayer graphene Hamiltonian μ is the chemical potential in eV, the two valleys are considered, q::Array,
+ is the momentum (in adimensional units). Spin degeneracy is not included.
 """
-function MLG_hamiltonian(μ, ν, q)
-    mat = spzeros(ComplexF64, 2, 2) 
-    st = _sublattice_coupling(q, ν)
-    mat[1:2,1:2] = [-μ st; conj(st) -μ]
-    return mat
+function MLG_hamiltonian(μ, q)
+    st = _sublattice_coupling(q)
+    return [-μ st; conj(st) -μ]
 end
 
-"intralayer coupling of graphene proyected into the layer and sublat
-space:  `t * 1im * Σ_i δ^l_i'* (q + n1*G1 + n2*G2 - κ^l) exp(1im*δ_i^l*K_l)`. 
-`l`` refers to the layer index and `δ^l_i` are the real space vectors connecting first 
-neighbours in the rotated layer"
-function _sublattice_coupling(q, ν)
-    t = -2.46575
-    b1 = 2π * [1, 1/√3]
-    b2 = 2π * [-1, 1/√3]
-    if ν == 1
-        K = κ(b1, b2)
-    else
-        K = κ(b2, b1)
-    end
-    δ1 = [0, 1/√3]
-    δ2 = [-1/2, -1/2/√3]
-    δ3 =  [1/2, -1/2/√3]
-    δs = [δ1, δ2, δ3]
-    qvecs =  q -  K 
-    return t * 1im * sum([δs[j]' * qvecs * exp(1im*δs[j]'*  K) for j in 1:3])
+function MLG_hamiltonian_derivatives(q)
+    st = _d_sublattice_coupling(q)
+    return [0 st[1]; conj(st[1]) 0], [0 st[2]; conj(st[2]) 0]
 end
 
-κ(G1, G2) =  1/3 * (2*G1+G2) 
-m(G1, G2) = 1/2 * (G1+G2)
-
+_sublattice_coupling(q) = t * sum([exp(1im*δs[j]'*  q)  for j in 1:3])
+"""
+[∂H/∂kx, ∂H/∂ky] for MLG hamiltonian along the :x and .:y directions.
+"""
+_d_sublattice_coupling(q) = [sum([q[1] * exp(1im*δs[j]'*  q) for j in 1:3]), 
+    sum(q[2]*[exp(1im*δs[j]'*  q) for j in 1:3])]
 
 #_________________________________________________________________________________________
 # 
@@ -52,38 +40,30 @@ function bands_MLG(μ, ν; kws...)
     kmesh = kpath()
     sys_dim = 2
     es = zeros(Float64, sys_dim, size(kmesh,1))
-    for i in 1:size(kmesh,1)
-        es[:,i] = real.(MLG_eigs(μ, ν, kmesh[i,:])[1])
-    end
+    [es[:,i] = real.(MLG_eigs(μ, ν, kmesh[i,:])[1]) for i in 1:size(kmesh,1)]
     return (es, )
 end
 
 function MLG_eigs(μ, ν, q; kws...)
-    l = eigen(Matrix(MLG_hamiltonian(μ, ν, q)))
+    l = eigen(Matrix(MLG_hamiltonian(μ, q)))
     return l.values, l.vectors
 end
 
 """given a mesh density with `pointsk` it computes the line K1, Γ, M, K2, where K1 and K2 
 are the non-equiv point of the MBZ"""
-function kpath(pointsk = 100)
-    b1 = 2π * [1, 1/√3]
-    b2 = 2π * [-1, 1/√3]
-    κ(G1, G2) =  1/3 * (2*G1+G2) 
-    m(G1, G2) = 1/2 * (G1+G2)
-    κ1 = κ(b1, b2)
-    κ2 = κ(b2, b1)
+function kpath(pointsk = 100)   
     meshdim = Int(5*pointsk/2 + 1)
     kpoints = zeros(Float64, meshdim, 2)
     for q = 1:meshdim
         if q <= pointsk
-            qx = κ1[1] - κ1[1]*(q - 1)/pointsk
-            qy = κ1[2] - κ1[2]*(q - 1)/pointsk
+            qx = K1[1] - K1[1]*(q - 1)/pointsk
+            qy = K1[2] - K1[2]*(q - 1)/pointsk
         elseif q > pointsk && q <= 2*pointsk
-            qx = (κ2[1] + κ1[1])/2*(q - 1 - pointsk)/pointsk
-            qy = (κ2[2] + κ1[2])/2*(q - 1 - pointsk)/pointsk
+            qx = (K2[1] + K1[1])/2*(q - 1 - pointsk)/pointsk
+            qy = (K2[2] + K1[2])/2*(q - 1 - pointsk)/pointsk
         else
-            qx = (κ2[1] + κ1[1])/2 + (κ2[1] - κ1[1])*(q - 1 - 2*pointsk)/pointsk
-            qy = (κ2[2] + κ1[2])/2 + (κ2[2] - κ1[2])*(q - 1 - 2*pointsk)/pointsk
+            qx = (K2[1] + K1[1])/2 + (K2[1] - K1[1])*(q - 1 - 2*pointsk)/pointsk
+            qy = (K2[2] + K1[2])/2 + (K2[2] - K1[2])*(q - 1 - 2*pointsk)/pointsk
         end
         kpoints[q,:] = [qx, qy]
     end
@@ -94,25 +74,23 @@ end
 
 function plotMLGbands(μ)
     mat, = bands_MLG(μ, 1)
-    mat2, = bands_MLG(μ, -1)
-    f = plotbands(mat, mat2)
+    f = plotbands(mat)
     return f
 end
 
-plotbands(mat, mat2; kw...) = plotbands!(Figure(), mat, mat2; kw...)
-function plotbands!(f, mat, mat2; dots = false, color = missing, ylimits = missing, xlimits = missing)
+plotbands(mat; kw...) = plotbands!(Figure(), mat; kw...)
+function plotbands!(f, mat; dots = false, color = missing, ylimits = missing, xlimits = missing)
     ax = Axis(f[1, 1]; xlabel = "k", ylabel = "E [eV]")
     xarr = collect(1:size(mat,2))
     pointsk = 2/5 * (length(xarr)-1)
     if dots == false
         for i in 1:size(mat, 1)
-            lines!(ax, xarr , mat[i,:], color = ifelse(isa(color,Missing), :lightgray, color))
-            lines!(ax, xarr , mat2[i,:], color = ifelse(isa(color,Missing), :orange, color))
+            lines!(ax, xarr , mat[i,:], color = ifelse(isa(color,Missing), :orange, color))
         end
     else
         for i in 1:size(mat, 1)
             scatter!(ax, collect(1:size(mat,2)) , mat[i,:], markersize = 5, markeralpha = 0.8)
-            scatter!(ax, collect(1:size(mat,2)) , mat2[i,:], markersize = 5, markeralpha = 0.8)
+         
         end
     end   
     ax.xticks = ([1, pointsk+1, 2*pointsk+1, 5*pointsk/2 + 1], ["K1", "Γ", "M", "K2"])

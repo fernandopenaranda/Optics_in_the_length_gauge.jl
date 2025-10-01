@@ -1,4 +1,4 @@
-struct Computation_presets
+@with_kw struct Computation_presets
     xbounds::SVector{2, Float64} # Integration limits along k-space x-axis
     ybounds::SVector{2, Float64} # Integration limits along k-space y-axis
     ωlist::Array{Float64}        # List of frequencies for numerical evaluation
@@ -6,17 +6,17 @@ struct Computation_presets
     evals::Number                # Max number of evaluations in adaptive integration
 end
 
-struct DOS_presets
+@with_kw struct DOS_presets
     h::Function # Hamiltonian H(k)
     computation::Computation_presets
 end
 
-struct JDOS_presets
+@with_kw struct JDOS_presets
     h::Function # Hamiltonian H(k)
     computation::Computation_presets
 end
 
-struct σij_presets
+@with_kw struct σij_presets
     dirJ::Symbol # i'th direction of σij
     dirE::Symbol # j'th direction of σij
     h::Function # Hamiltonian H(k)

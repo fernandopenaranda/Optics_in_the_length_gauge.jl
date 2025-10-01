@@ -11,6 +11,7 @@ module Optics_in_the_length_gauge
     using Unitful
     using SparseArrays
     using StaticArrays
+    using Parameters
 
 
     const k_B = (PhysicalConstants.CODATA2018.k_B |> u"eV/mK").val

@@ -9,6 +9,12 @@ Input:
     `evals::Int` number of steps in the adaptive integration
     `ωlist::Vector` frequency list of the incoming radiation
 """
+linear_optical_conductivity(params::σij_presets) =
+    linear_optical_conductivity(params.dirJ, params.dirE, params.h, params.nabla_h, 
+    params.computation.xbounds, params.computation.ybounds, 
+    params.computation.ωlist, η = params.computation.broadening, 
+    evals = params.computation.evals)
+
 function linear_optical_conductivity(dirJ::Symbol, dirE::Symbol, h::Function, dh, xbounds, ybounds, 
     ωlist; η = 0.1, evals = 10000, kws...)
     conds = zeros(Float64, length(ωlist))

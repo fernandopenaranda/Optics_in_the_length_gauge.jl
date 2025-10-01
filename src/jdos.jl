@@ -5,6 +5,12 @@ BZ bounds along the x (xbounds) and y (ybounds) direction.
 - `η` defines the energy broadening of the Lorentzian peaks.
 - `evals` sets the mesh size in the BZ integration
 """
+
+dos(params::DOS_presets) =
+    dos(params.h, params.computation.xbounds, params.computation.ybounds, 
+    params.computation.ωlist, η = params.computation.broadening, evals =
+    params.computation.evals)
+
 function dos(h, xbounds, ybounds, ωlist; η = 0.1, evals = 10000, kws...)
     dos = zeros(Float64, length(ωlist))
     half_dim = length(ωlist)÷2
@@ -31,6 +37,11 @@ BZ bounds along the x (xbounds) and y (ybounds) direction.
 - `η` defines the energy broadening of the Lorentzian peaks.
 - `evals` sets the mesh size in the BZ integration
 """
+jdos(params::JDOS_presets) =
+    jdos(params.h, params.computation.xbounds, params.computation.ybounds, 
+    params.computation.ωlist, η = params.computation.broadening, evals =
+    params.computation.evals)
+
 function jdos(h, xbounds, ybounds, ωlist; η = 0.1, evals = 10000, kws...)
     jdos = zeros(Float64, length(ωlist))
     half_dim = length(ωlist)÷2

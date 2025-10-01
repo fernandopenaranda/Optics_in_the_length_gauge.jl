@@ -16,10 +16,13 @@ function MLG_hamiltonian(μ, q)
     return [-μ st; conj(st) -μ]
 end
 
-function MLG_hamiltonian_derivatives(q)
+function MLG_deriv(q, dir::Symbol)
+    ind = (dir == :x ? 1 : 2)
     st = _d_sublattice_coupling(q)
-    return [0 st[1]; conj(st[1]) 0], [0 st[2]; conj(st[2]) 0]
+    return [0 st[ind]; conj(st[ind]) 0]
 end
+
+MLG_nabla(q) = [MLG_deriv(q, :x), MLG_deriv(q, :y)]
 
 _sublattice_coupling(q) = t1 * sum([exp(1im*δs[j]'*  q)  for j in 1:3])
 """

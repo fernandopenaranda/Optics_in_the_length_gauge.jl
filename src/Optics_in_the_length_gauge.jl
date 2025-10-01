@@ -1,5 +1,4 @@
 module Optics_in_the_length_gauge
-
     using Arpack
     using LinearAlgebra
     using Cubature
@@ -30,5 +29,6 @@ module Optics_in_the_length_gauge
     # Presets
     include("presets/MLG_ham.jl")
     
-    export dos, jdos, linear_optical_conductivity, Computation_presets
+    export  Computation_presets, DOS_presets, JDOS_presets, σij_presets
+    export dos, jdos, linear_optical_conductivity
 end

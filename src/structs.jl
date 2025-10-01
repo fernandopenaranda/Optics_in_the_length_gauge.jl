@@ -8,7 +8,6 @@ end
 
 struct DOS_presets
     h::Function # Hamiltonian H(k)
-    nabla_h::Function # ∇_k H(k)
     computation::Computation_presets
 end
 

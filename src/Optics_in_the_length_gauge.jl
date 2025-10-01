@@ -28,18 +28,25 @@ module Optics_in_the_length_gauge
     include("jdos.jl")
     include("linear_conductivity.jl")
 
+    
     # Presets
+    # Export the presets submodule
+    export presets
+
+    # Include the presets file(s)
     include("presets/MLG_ham.jl")
 
-    # Import submodules
+    # Import the submodule
     using .MLGPresets
-    # Re-export presets submodule functions
-    module presets
+
+    # Create a nested submodule for the exported presets
+    module Presets
+        export MLG_hamiltonian, MLG_nabla   # export functions in this submodule
         using ..MLGPresets: MLG_hamiltonian, MLG_nabla
     end
-    # Presets
+
+
 
     export Computation_presets, DOS_presets, JDOS_presets, σij_presets
     export dos, jdos, linear_optical_conductivity
-    export presets
 end

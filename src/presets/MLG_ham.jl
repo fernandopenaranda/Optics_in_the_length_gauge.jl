@@ -31,4 +31,4 @@ module MLGPresets
         sum([δs[j][2] * exp(1im*δs[j]'*  q) for j in 1:3])]
     export MLG_hamiltonian, MLG_nabla
 end
-end
+

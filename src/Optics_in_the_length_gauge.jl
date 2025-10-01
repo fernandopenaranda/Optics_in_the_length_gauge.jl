@@ -31,7 +31,7 @@ module Optics_in_the_length_gauge
     
     # Presets
     # Export the presets submodule
-    export presets
+    export Presets
 
     # Include the presets file(s)
     include("presets/MLG_ham.jl")

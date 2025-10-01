@@ -10,9 +10,9 @@ module Optics_in_the_length_gauge
     using PhysicalConstants
     using PhysicalConstants.CODATA2018
     using Unitful
-    using CairoMakie
     using SparseArrays
     using StaticArrays
+    using Parameters
 
 
     const k_B = (PhysicalConstants.CODATA2018.k_B |> u"eV/mK").val
@@ -22,13 +22,31 @@ module Optics_in_the_length_gauge
     const C_cd = ((e^2/ħ) |> u"μA/V").val
     const ħ_ev_s = (ħ |> u"eV*s").val
     
+    include("structs.jl")
     include("optics_operators.jl")
     include("integration.jl")
     include("jdos.jl")
     include("linear_conductivity.jl")
 
-    # Presets
-    include("presets/MLG_ham.jl")
     
-    export jdos, linear_optical_conductivity
+    # Presets
+    # Export the presets submodule
+    export Presets
+
+    # Include the presets file(s)
+    include("presets/MLG_ham.jl")
+
+    # Import the submodule
+    using .MLGPresets
+
+    # Create a nested submodule for the exported presets
+    module Presets
+        export MLG_hamiltonian, MLG_nabla, K1, K2   # export functions in this submodule
+        using ..MLGPresets: MLG_hamiltonian, MLG_nabla, K1, K2
+    end
+
+
+
+    export Computation_presets, DOS_presets, JDOS_presets, σij_presets
+    export dos, jdos, linear_optical_conductivity
 end

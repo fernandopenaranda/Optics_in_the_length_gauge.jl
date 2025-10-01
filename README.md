@@ -1,24 +1,35 @@
 # Optics_in_the_length_gauge
 
-<!-- [![Build Status](https://github.com/fernandopenaranda/Optics_in_the_length_gauge.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/fernandopenaranda/Optics_in_the_length_gauge.jl/actions/workflows/CI.yml?query=branch%3Amain) -->
+[![Build Status](https://github.com/fernandopenaranda/Optics_in_the_length_gauge.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/fernandopenaranda/Optics_in_the_length_gauge.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
-Given a k space Hamiltonian, $H(\vec k)$, it computes several optical responses in the length gauge:
+## Outline
+Computes several spectral quantities and optical responses of general k-space Hamiltonians in the length gauge, including:
+
++ Density of states
 
 + Joint density of states
-  + $\text{jdos}(\omega) = \omega f_{nm} \delta(\omega-\omega_{mn})$
-  + 2D implementation
+  + $\text{jdos}(\omega) = \sum_{nm} f_{nm} \delta(\omega-\omega_{mn})$
 
-+ Linear optical response $\vec{J}_a = σ_{ab}(ω) \vec{J}_b$ (absortive)
-   + $\sigma_{ab}^{\text{abs}}(\omega) = \frac{\pi e^2}{\hbar} \sum_{n,m} \omega f_{nm} r_{nm}^a r_{mn}^b \delta(\omega-\omega_{mn})$
-   + 2D implementation
++ Linear optical responses $\vec{J}_a = σ_{ab}(ω) \vec{J}_b$ (absortive)
+   + $\sigma_{ab}^{\text{abs}}(\omega) = \frac{\pi e^2}{\hbar} \sum_{n,m} \int \frac{d\vec k}{(2\pi)^d}(-\omega) f_{nm} r_{nm}^a r_{mn}^b \delta(\omega-\omega_{mn})$
+   + 2D implementation -> Generalize to unbounded 3D (trivial)
 
-    where $a$ and $b$ denote spatial directions unbounded dimensions 
+    where $a$ and $b$ denote spatial directions in unbounded dimensions 
+
++ Shift and Injection currents [included in future versions]
++ Circular Dichroism [included in future versions]
++ (Inverse) Faraday [included in future versions]
++ Magneto conductivity
 + ...
+  
+Input: the Hamiltonian $H(\vec{k})$, its gradient $\nabla_{\vec{k}} H(\vec{k})$, and the Brillouin zone boundaries.
 
-Input: $H(\vec k)$, $\vec \partial H(\vec k)/\partial \vec k$, and the boundaries of the BZ (the latter two in improved versions will be computed automatically).
+## Worked examples
 
-Comments: 
+See linear optical conductivity calculations in MLG: /examples/MLG.ipynb
+
+### Comments: 
 
 + Input units: $\omega$ in eV, BZ boundaries: adimensional (multiplied by $a_0$ the lattice constant)
 + $\delta(\omega-\omega_{mn})$ is approximated by a Lorentzian broadened by $\Gamma$: $\frac{\Gamma}{(\omega-\omega_{mn})^2 + \Gamma^2}$
-+ IMPORTANT, the adaptive integration in 2D assumes a rectangular grid, take this in mind when passing the bounds. Improvement needed.
++ IMPORTANT, the adaptive integration in 2D assumes a rectangular BZ, take this in mind when passing the bounds `xbounds` and `ybounds`

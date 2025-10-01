@@ -10,7 +10,6 @@ module Optics_in_the_length_gauge
     using PhysicalConstants
     using PhysicalConstants.CODATA2018
     using Unitful
-    using CairoMakie
     using SparseArrays
     using StaticArrays
 
@@ -22,6 +21,7 @@ module Optics_in_the_length_gauge
     const C_cd = ((e^2/ħ) |> u"μA/V").val
     const ħ_ev_s = (ħ |> u"eV*s").val
     
+    include("structs.jl")
     include("optics_operators.jl")
     include("integration.jl")
     include("jdos.jl")
@@ -30,5 +30,5 @@ module Optics_in_the_length_gauge
     # Presets
     include("presets/MLG_ham.jl")
     
-    export dos, jdos, linear_optical_conductivity
+    export dos, jdos, linear_optical_conductivity, Computation_presets
 end

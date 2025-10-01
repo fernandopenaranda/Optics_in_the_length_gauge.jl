@@ -3,7 +3,7 @@ struct Computation_presets
     ybounds::SVector{2, Float64} # Integration limits along k-space y-axis
     ωlist::Array{Float64}        # List of frequencies for numerical evaluation
     broadening::Float64          # Phenomenological δ-function broadening
-    evals::Number                #  Max number of evaluations in adaptive integration
+    evals::Number                # Max number of evaluations in adaptive integration
 end
 
 struct DOS_presets

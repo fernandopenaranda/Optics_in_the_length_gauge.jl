@@ -1,6 +1,4 @@
-using Optics_in_the_length_gauge
 using Test
+using Optics_in_the_length_gauge
 
-@testset "Optics_in_the_length_gauge.jl" begin
-    include("MLG_jdos.jl")
-end
+include("MLG_calcs.jl")

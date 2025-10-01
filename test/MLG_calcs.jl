@@ -13,7 +13,7 @@
     dos_presets = DOS_presets(h = h, computation = cp)
     jdos_presets = JDOS_presets(h, cp)
     sigma_ij_presets = σij_presets(:x, :x, h,
-        nabla_h, ncp)
+        nabla_h, cp)
 
     @test dos(dos_presets)
     @test jdos(jdos_presets)

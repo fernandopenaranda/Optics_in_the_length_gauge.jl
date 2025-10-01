@@ -41,8 +41,8 @@ module Optics_in_the_length_gauge
 
     # Create a nested submodule for the exported presets
     module Presets
-        export MLG_hamiltonian, MLG_nabla   # export functions in this submodule
-        using ..MLGPresets: MLG_hamiltonian, MLG_nabla
+        export MLG_hamiltonian, MLG_nabla, K1, K2   # export functions in this submodule
+        using ..MLGPresets: MLG_hamiltonian, MLG_nabla, K1, K2
     end
 
 

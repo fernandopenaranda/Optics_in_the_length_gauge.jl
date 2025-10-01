@@ -29,6 +29,6 @@ module MLGPresets
     """
     _d_sublattice_coupling(q) = 1im * t1 .* [sum([δs[j][1] * exp(1im*δs[j]'*  q) for j in 1:3]), 
         sum([δs[j][2] * exp(1im*δs[j]'*  q) for j in 1:3])]
-    export MLG_hamiltonian, MLG_nabla
+    export MLG_hamiltonian, MLG_nabla, K1, K2
 end
 

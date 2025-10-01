@@ -10,7 +10,7 @@ Package to compute several spectral quantities and optical responses of general 
   + $\text{jdos}(\omega) = \sum_{nm} f_{nm} \delta(\omega-\omega_{mn})$
 
 + Linear optical responses $\vec{J}_a = σ_{ab}(ω) \vec{J}_b$ (absortive)
-   + $\sigma_{ab}^{\text{abs}}(\omega) = \frac{\pi e^2}{\hbar} \sum_{n,m} \omega f_{nm} r_{nm}^a r_{mn}^b \delta(\omega-\omega_{mn})$
+   + $\sigma_{ab}^{\text{abs}}(\omega) = \frac{\pi e^2}{\hbar} \sum_{n,m} \int \frac{d\vec k}{(2\pi)^d}(-\omega) f_{nm} r_{nm}^a r_{mn}^b \delta(\omega-\omega_{mn})$
    + 2D implementation -> Generalize to unbounded 3D (trivial)
 
     where $a$ and $b$ denote spatial directions unbounded dimensions 

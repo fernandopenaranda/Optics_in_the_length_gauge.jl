@@ -39,6 +39,7 @@ module Optics_in_the_length_gauge
     end
     # Presets
 
-    export  Computation_presets, DOS_presets, JDOS_presets, σij_presets
+    export Computation_presets, DOS_presets, JDOS_presets, σij_presets
     export dos, jdos, linear_optical_conductivity
+    export presets
 end

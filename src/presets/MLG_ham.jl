@@ -1,5 +1,5 @@
 
-const t = -2.46575 # hopping amplitude
+const t1 = -2.46575 # hopping amplitude
 const δ1 = [1/2, √3/2]
 const δ2 = [1/2, -√3/2]
 const δ3 =  [-1,0]
@@ -21,12 +21,12 @@ function MLG_hamiltonian_derivatives(q)
     return [0 st[1]; conj(st[1]) 0], [0 st[2]; conj(st[2]) 0]
 end
 
-_sublattice_coupling(q) = t * sum([exp(1im*δs[j]'*  q)  for j in 1:3])
+_sublattice_coupling(q) = t1 * sum([exp(1im*δs[j]'*  q)  for j in 1:3])
 """
 [∂H/∂kx, ∂H/∂ky] for MLG hamiltonian along the :x and .:y directions.
 """
-_d_sublattice_coupling(q) = [sum([q[1] * exp(1im*δs[j]'*  q) for j in 1:3]), 
-    sum(q[2]*[exp(1im*δs[j]'*  q) for j in 1:3])]
+_d_sublattice_coupling(q) = 1im * t1 .* [sum([δs[j][1] * exp(1im*δs[j]'*  q) for j in 1:3]), 
+    sum([δs[j][2] * exp(1im*δs[j]'*  q) for j in 1:3])]
 
 #_________________________________________________________________________________________
 # 

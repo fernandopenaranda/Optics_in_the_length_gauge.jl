@@ -17,8 +17,7 @@ function linear_optical_conductivity(dirJ::Symbol, dirE::Symbol, h::Function, dh
         dirJ, dirE, h, dh, xbounds, ybounds, η, evals)
     conds[half_dim+1:length(ωlist)] .= integral_linear(ωlist[half_dim+1:length(ωlist)],
         dirJ, dirE, h, dh, xbounds, ybounds, η, evals)
-    deg_degrees_of_freedom = 4
-    return ωlist, 4 * deg_degrees_of_freedom * conds
+    return ωlist, π * conds #units of e^2/(16ħ)
 end
 
 function integral_linear(ωlist::Array, dirJ, dirE, h, dh, xbounds, ybounds, η, evals)
@@ -29,7 +28,7 @@ end
 function σab_linear_ω(ωlist::Array, h, dh_dirJ, dh_dirE, η)
     ϵs, ψs = eigen(Matrix(h))
     mat = linear_integrand(ϵs, ψs, dh_dirJ, dh_dirE)
-    return [π .* sum_nondiag(mat .* lorentz(ϵs, ω, η) .* -ω) for ω in ωlist] 
+    return [sum_nondiag(mat .* lorentz(ϵs, ω, η) .* -ω) for ω in ωlist] 
 end
 
 linear_integrand(ϵs, ψs, dha, dhb) = f(ϵs, 0.0, 0.0) .* (r(ϵs, ψs, dha) .* t(r(ϵs, ψs, dhb)))

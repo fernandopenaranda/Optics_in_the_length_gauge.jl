@@ -12,32 +12,35 @@
     `rz` rz operator(q)
     details on the Hamiltonian (the chemical potential and dielectric field...) are set in the parameters of the Hamiltonian stored in `planar_σijk_presets`
 """
-linear_magneto_conductivity(params::planar_σijk_presets) =
+linear_magneto_conductivity(params::Planar_σijk_presets) =
     linear_magneto_conductivity(
         params.dirJ, params.dirE, params.dirB, params.h, params.nabla_h, 
         params.nabla_nabla_h, params.rz, params.τ, params.T,
-        params.berry_contribution, params.omm_contribution, params.fermi_surface, params.withshift,
+        params.berry_contribution, params.omm_contribution, params.fermi_surface, params.with_shift,
         params.computation.xbounds, params.computation.ybounds, params.computation.evals)
 
 function linear_magneto_conductivity(i,j,k, h, dh, ddh, rz, τ, T, Ω_contr, omm_contr, #N
     fermi_surface, with_shift, xbounds, ybounds, evals; rel_tol = 1e-5, abs_tol = 0)
     integrand(q) = k_linear_magneto_conductivity(i, j, k, h, dh, ddh, rz, q; T = T, τ = τ, 
-        Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface)
-    val, _ = bz_integration_transport(integrand, xbounds, ybounds, evals, reltol = rel_tol, abstol = abs_tol)
+        Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface, with_shift = with_shift)  
+    val = bz_integration_transport(integrand, xbounds, ybounds, evals, rel_tol = rel_tol, abs_tol = abs_tol)
     bz_vol = (1/(2pi*ang_to_m^2))^(length(xbounds))
     return bz_vol * val 
 end
 
-function k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, ddh, rz, q; 
-        T = 2, τ = 1e-15, Ω_contr = true, omm_contr = true, fermi_surface = false)
-    ϵs, ψs = eigen(Matrix(h))
-    C = 1e3 * 2π * τ                                                             
-    σxxx = C * k_linear_mr_integrand(i, j, k, ϵs, ψs, rz, dh[1], dhy[2], ddh, 0, T,     # generalize to σyyy too
-        Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface) 
-    if withshift == false                                                               # check the 1e3!!!!!!!!
+k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, ddhi, rz::Function, q; kws...) =  
+    k_linear_magneto_conductivity(i, j, k, h, dh, ddhi, rz(q), q; kws...)
+
+function k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, ddhi, rz::Matrix, q; 
+        T = 2, τ = 1e-15, Ω_contr = true, omm_contr = true, fermi_surface = false, with_shift = true)
+    ϵs, ψs = eigen(Matrix(h(q)))                                                                           # check the 1e3!!!!!!!!
+    C = 1e3 * 2π * τ                                       
+    σxxx = C * k_linear_mr_integrand(i, j, k, ϵs, ψs, rz, dh(q)[1], dh(q)[2], ddhi(q), 0, T,           
+        Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface)                           # generalize to σyyy too   
+    if with_shift == false                                                               
         return σxxx
     else
-        σxxx_shift = C * k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rz, dhx, dhy, dhxx, μ, T)
+        σxxx_shift = C * k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rz, dh(q)[1], dh(q)[2], ddhi(q), μ, T)
         return σxxx + σxxx_shift  
     end                      
 end
@@ -83,6 +86,7 @@ mr_vij(i, vj,rz, vij) = real(OMM(i, vj, rz) .* diag(vij))
 
 δμ_shift(i, ϵs, T, vj, rj, rz) = sum(d_f(ϵs, 0, T) .* (OMM(i, vj, rz)) + 
    (Ωin(i, rj, rz)) .* f(ϵs, 0, T)/ħ_ev_s) #units 1/e m^2
+
 # ----------------------------------------------------------------------------------------
 #           Magnetorresistance integrand terms: m_Ω, m_OMM, and n-fixing correction
 #                          before convoluting with Fermi derivatives                              

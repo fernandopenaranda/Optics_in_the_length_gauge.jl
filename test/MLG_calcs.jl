@@ -23,7 +23,7 @@ end
     sigma_ij_presets = σij_presets(:x, :x, h,
         nabla_h, cp)
 
-    @test 1==1#does_not_throw(dos, dos_presets)
+    @test does_not_throw(dos, dos_presets)
     @test does_not_throw(jdos, jdos_presets)
     @test does_not_throw(linear_optical_conductivity, sigma_ij_presets)
 end

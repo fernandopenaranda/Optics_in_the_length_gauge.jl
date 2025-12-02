@@ -66,7 +66,7 @@ lorentz(ϵs, ω, η) = 1/π .* η ./ (δ(ϵs, ω).^2 .+ η^2)
 Ω(ϵs) = ϵs .- t(ϵs) +  1e-7 * Diagonal(ϵs) .+ 1e-35# the last term is just to avoid infinities 
 #it'll cancel out later
 # Δ(ψs, dh) = vel(ψs, dh) - t(vel(ψs, dh))
-vel(ψs, dh) = ψs' * dh * ψs # It really is hbar v  # Units: meV Å  
+vel(ψs, dh) = ψs' * dh * ψs # It really is hbar v  # Units: [H] Å  
 
 function omega_r_Δ(ϵs, ψs, dh)
     vmat = vel(ψs, dh)

@@ -1,7 +1,7 @@
 """
     returns the real (absortive) part of the linear optical conductivity
     `σab_inter_linear(dirE, dirJ, h, dh, ωlist, η = broadening, evals = evals)``
-Input: 
+    Input: 
     `dirJ::Symbol`, `dirE::Symbol`, directions of J and E (tensor component of the conductivity)`::Symbols -> {:x, :y}` unbounded 2D directions
     `h::Function` is a Hamiltonian function with dependence on momentum `q`
     `dh::Vector{Function}` is ∇h along the x and y directions (2D). An array of functions `dh = [dh_x(q), dh_y(q)]` of momentum `q`
@@ -10,7 +10,7 @@ Input:
     `ωlist::Vector` frequency list of the incoming radiation
 """
 linear_optical_conductivity(params::σij_presets) =
-    linear_optical_conductivity(params.dirJ, params.dirE, params.h, params.nabla_h, 
+    linear_optical_conductivity(params.dirJ, params.dirE, params.h, params.nabla_h,
     params.computation.xbounds, params.computation.ybounds, 
     params.computation.ωlist, η = params.computation.broadening, 
     evals = params.computation.evals)
@@ -28,7 +28,8 @@ end
 
 function integral_linear(ωlist::Array, dirJ, dirE, h, dh, xbounds, ybounds, η, evals)
     integrand(q) = real(σab_linear_ω(ωlist, h(q), dh(q)[dir_to_ind(dirJ)], dh(q)[dir_to_ind(dirE)], η))
-    return bz_integration(integrand, xbounds, ybounds, ωlist, evals)
+    bz_vol = (1/(2pi))^(length(xbounds)) 
+    return bz_vol .* bz_integration(integrand, xbounds, ybounds, ωlist, evals)
 end
 
 function σab_linear_ω(ωlist::Array, h, dh_dirJ, dh_dirE, η)

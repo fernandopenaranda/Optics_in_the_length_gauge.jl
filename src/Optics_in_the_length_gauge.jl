@@ -28,7 +28,7 @@ module Optics_in_the_length_gauge
     include("jdos.jl")
     include("linear_optical_conductivity.jl")
     #...
-    export Optical_computation_presets, Transport_computation_presets, DOS_presets, JDOS_presets, σij_presets
+    export Optical_computation_presets, Transport_computation_presets, DOS_presets, JDOS_presets, σij_presets, Drude_presets, planar_σijk_presets
     export dos, jdos, linear_optical_conductivity, linear_magneto_conductivity
     
     # Export the presets submodule

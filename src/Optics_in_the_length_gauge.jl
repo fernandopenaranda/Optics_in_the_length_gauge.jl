@@ -1,5 +1,4 @@
 module Optics_in_the_length_gauge
-
     using Arpack
     using LinearAlgebra
     using Cubature
@@ -13,8 +12,6 @@ module Optics_in_the_length_gauge
     using SparseArrays
     using StaticArrays
     using Parameters
-
-
     const k_B = (PhysicalConstants.CODATA2018.k_B |> u"eV/mK").val
     const ħ = PhysicalConstants.CODATA2018.ħ
     const e = PhysicalConstants.CODATA2018.e
@@ -39,5 +36,4 @@ module Optics_in_the_length_gauge
         export MLG_hamiltonian, MLG_nabla, K1, K2   # export functions in this submodule
         using ..MLGPresets: MLG_hamiltonian, MLG_nabla, K1, K2
     end
-    
 end

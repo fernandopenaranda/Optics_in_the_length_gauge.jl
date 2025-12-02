@@ -23,30 +23,21 @@ module Optics_in_the_length_gauge
     const ħ_ev_s = (ħ |> u"eV*s").val
     
     include("structs.jl")
-    include("optics_operators.jl")
+    include("length_gauge_operators.jl")
     include("integration.jl")
     include("jdos.jl")
-    include("linear_conductivity.jl")
-
+    include("linear_optical_conductivity.jl")
+    #...
+    export Optical_computation_presets, Transport_computation_presets, DOS_presets, JDOS_presets, σij_presets
+    export dos, jdos, linear_optical_conductivity, linear_magneto_conductivity
     
-    # Presets
     # Export the presets submodule
-    export Presets
-
-    # Include the presets file(s)
-    include("presets/MLG_ham.jl")
-
-    # Import the submodule
-    using .MLGPresets
-
-    # Create a nested submodule for the exported presets
-    module Presets
+    export Presets 
+    include("presets/MLG_ham.jl") 
+    using .MLGPresets  # Import the submodule
+    module Presets # Create a nested submodule for the exported presets
         export MLG_hamiltonian, MLG_nabla, K1, K2   # export functions in this submodule
         using ..MLGPresets: MLG_hamiltonian, MLG_nabla, K1, K2
     end
-
-
-
-    export Computation_presets, DOS_presets, JDOS_presets, σij_presets
-    export dos, jdos, linear_optical_conductivity
+    
 end

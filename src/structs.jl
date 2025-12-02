@@ -1,8 +1,16 @@
-@with_kw struct Computation_presets
+# UNITS E -> eV, time -> s, length -> Å, temperature -> K
+
+@with_kw struct Optical_computation_presets
     xbounds::SVector{2, Float64} # Integration limits along k-space x-axis
     ybounds::SVector{2, Float64} # Integration limits along k-space y-axis
     ωlist::Array{Float64}        # List of frequencies for numerical evaluation
     broadening::Float64          # Phenomenological δ-function broadening
+    evals::Number                # Max number of evaluations in adaptive integration
+end
+
+@with_kw struct Tranport_computation_presets
+    xbounds::SVector{2, Float64} # Integration limits along k-space x-axis
+    ybounds::SVector{2, Float64} # Integration limits along k-space y-axis
     evals::Number                # Max number of evaluations in adaptive integration
 end
 
@@ -16,10 +24,33 @@ end
     computation::Computation_presets
 end
 
+@with_kw struct Drude_presets
+    dirJ::Symbol # i'th direction of σij
+    dirE::Symbol # j'th direction of σij
+    h::Function # Hamiltonian H(k)
+    dhi::Function # k-derivative of H(k) in dirE
+    T::Float64
+    τ::Float64
+    computation::Union{Optical_computation_presets, Optical_computation_presets}
+end
+
+
 @with_kw struct σij_presets
     dirJ::Symbol # i'th direction of σij
     dirE::Symbol # j'th direction of σij
     h::Function # Hamiltonian H(k)
     nabla_h::Function # ∇_k H(k)
-    computation::Computation_presets
+    computation::Union{Optical_computation_presets, Optical_computation_presets}
+end
+
+@with_kw struct planar_σijk_presets
+    dirJ::Symbol # i'th direction of σij
+    dirE::Symbol # j'th direction of σij
+    h::Function # Hamiltonian H(k)
+    nabla_h::Function # ∇_k H(k)
+    nabla_nabla_h::Function #∂^2/∂x^2 H(k)
+    rz_mat::Function
+    τ::Float64 # scattering time
+    T::Number # Temperature in K
+    computation::Union{Optical_computation_presets, Optical_computation_presets}
 end

@@ -8,7 +8,7 @@
     evals::Number                # Max number of evaluations in adaptive integration
 end
 
-@with_kw struct Tranport_computation_presets
+@with_kw struct Transport_computation_presets
     xbounds::SVector{2, Float64} # Integration limits along k-space x-axis
     ybounds::SVector{2, Float64} # Integration limits along k-space y-axis
     evals::Number                # Max number of evaluations in adaptive integration

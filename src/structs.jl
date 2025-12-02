@@ -16,12 +16,12 @@ end
 
 @with_kw struct DOS_presets
     h::Function # Hamiltonian H(k)
-    computation::Computation_presets
+    computation::Union{Optical_computation_presets, Optical_computation_presets}
 end
 
 @with_kw struct JDOS_presets
     h::Function # Hamiltonian H(k)
-    computation::Computation_presets
+    computation::Union{Optical_computation_presets, Optical_computation_presets}
 end
 
 @with_kw struct Drude_presets

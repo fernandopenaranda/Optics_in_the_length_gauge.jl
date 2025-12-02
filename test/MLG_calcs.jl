@@ -8,7 +8,7 @@ function does_not_throw(f::Function, args...)
 end
 
 @testset "MLG_calcs" begin
-    cp = Computation_presets(
+    cp = Optical_computation_presets(
         xbounds = [0, 2π/√3],
         ybounds = [-2π, 2π],
         ωlist = collect(0:1:2),

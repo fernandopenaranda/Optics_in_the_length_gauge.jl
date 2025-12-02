@@ -25,7 +25,7 @@ end
     dhx(q) = Presets.MLG_nabla(q)[1]
     dhy(q) = Presets.MLG_nabla(q)[2]
     dhxx(q) = Presets.MLG_2deriv(q,:x)
-    rz_mat(q) = [1 0;0 1.0] #no q dependence
+    rz_mat(q,ψs) = ψs'*ψs #no q dependence
     # spectral tests
     dos_presets = DOS_presets(h, cpo)
     jdos_presets = JDOS_presets(h, cpo)

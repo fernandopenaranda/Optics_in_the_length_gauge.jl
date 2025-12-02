@@ -28,19 +28,16 @@ function linear_magneto_conductivity(i,j,k, h, dh, ddh, rz, τ, T, Ω_contr, omm
     return bz_vol * val 
 end
 
-k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, ddhi, rz::Function, q; kws...) =  
-    k_linear_magneto_conductivity(i, j, k, h, dh, ddhi, rz(q), q; kws...)
-
-function k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, ddhi, rz::Matrix, q; 
+function k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, ddhi, rz::Function, q; 
         T = 2, τ = 1e-15, Ω_contr = true, omm_contr = true, fermi_surface = false, with_shift = true)
     ϵs, ψs = eigen(Matrix(h(q)))                                                                           # check the 1e3!!!!!!!!
     C = 1e3 * 2π * τ                                       
-    σxxx = C * k_linear_mr_integrand(i, j, k, ϵs, ψs, rz, dh(q)[1], dh(q)[2], ddhi(q), 0, T,           
+    σxxx = C * k_linear_mr_integrand(i, j, k, ϵs, ψs, rz(q, ψs), dh(q)[1], dh(q)[2], ddhi(q), 0, T,           
         Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface)                           # generalize to σyyy too   
     if with_shift == false                                                               
         return σxxx
     else
-        σxxx_shift = C * k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rz, dh(q)[1], dh(q)[2], ddhi(q), μ, T)
+        σxxx_shift = C * k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rz(q, ψs), dh(q)[1], dh(q)[2], ddhi(q), μ, T)
         return σxxx + σxxx_shift  
     end                      
 end

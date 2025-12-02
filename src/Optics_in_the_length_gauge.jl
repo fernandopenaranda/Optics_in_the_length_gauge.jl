@@ -20,15 +20,6 @@ module Optics_in_the_length_gauge
     const ħ_ev_s = (ħ |> u"eV*s").val
     const ang_to_m = 1e-10
 
-    function does_not_throw(f::Function, args...)
-        try
-            f(args...)
-            return true   # no error
-        catch
-            return false  # error occurred
-        end
-    end
-    
     include("structs.jl")
     include("length_gauge_operators.jl")
     include("integration.jl")
@@ -38,7 +29,7 @@ module Optics_in_the_length_gauge
     include("linear_magneto_transport.jl")
     #...
     export Optical_computation_presets, Transport_computation_presets, DOS_presets, JDOS_presets, σij_presets, Drude_presets, Planar_σijk_presets
-    export does_not_throw, dos, jdos, linear_optical_conductivity, linear_magneto_conductivity, drude_conductivity
+    export dos, jdos, linear_optical_conductivity, linear_magneto_conductivity, drude_conductivity
     
     # Export the presets submodule
     export Presets 

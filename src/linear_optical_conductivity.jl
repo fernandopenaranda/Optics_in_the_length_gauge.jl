@@ -29,7 +29,7 @@ end
 function integral_linear(ωlist::Array, dirJ, dirE, h, dh, xbounds, ybounds, η, evals)
     integrand(q) = real(σab_linear_ω(ωlist, h(q), dh(q)[dir_to_ind(dirJ)], dh(q)[dir_to_ind(dirE)], η))
     bz_vol = (1/(2pi))^(length(xbounds)) 
-    return bz_vol .* bz_integration(integrand, xbounds, ybounds, ωlist, evals)
+    return bz_vol .* bz_integration_optical(integrand, xbounds, ybounds, ωlist, evals)
 end
 
 function σab_linear_ω(ωlist::Array, h, dh_dirJ, dh_dirE, η)

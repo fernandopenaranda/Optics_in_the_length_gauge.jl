@@ -14,7 +14,9 @@ module MLGPresets
         st = _sublattice_coupling(q)
         return [-μ st; conj(st) -μ]
     end
-
+    """
+    monolayer graphene k-derivative along the x and y directions.
+    """
     function MLG_deriv(q, dir::Symbol)
         ind = (dir == :x ? 1 : 2)
         st = _d_sublattice_coupling(q)
@@ -29,6 +31,16 @@ module MLGPresets
     """
     _d_sublattice_coupling(q) = 1im * t1 .* [sum([δs[j][1] * exp(1im*δs[j]'*  q) for j in 1:3]), 
         sum([δs[j][2] * exp(1im*δs[j]'*  q) for j in 1:3])]
-    export MLG_hamiltonian, MLG_nabla, K1, K2
-end
+    """
+    monolayer graphene second k-derivative along the i direction.
+    ∂^2H/∂ki^2 for MLG Hamiltonian along the :i direction
+    """
+    function MLG_2deriv(q, dir::Symbol)
+        ind = (dir == :x ? 1 : 2)
+        st = _d_d_sublattice_coupling(q, ind)
+        return [0 st[ind]; conj(st[ind]) 0]
+    end
+    _d_d_sublattice_coupling(q, ind) = -t1 .* sum([(δs[j][ind])^2 * exp(1im*δs[j]'*  q) for j in 1:3])
 
+    export MLG_hamiltonian, MLG_nabla, MLG_2deriv, K1, K2
+end

@@ -107,7 +107,7 @@ function fn(ϵn, μ, T)
     if T == 0
         return ifelse(ϵn < μ, 1.0, 0.0)
     else
-        return 1/(exp((ϵn - μ)/(k_B * T)) + 1)
+        return 1/(exp((ϵn - μ)/(kB * T)) + 1)
     end
 end
     

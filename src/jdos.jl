@@ -5,7 +5,6 @@ BZ bounds along the x (xbounds) and y (ybounds) direction.
 - `η` defines the energy broadening of the Lorentzian peaks.
 - `evals` sets the mesh size in the BZ integration
 """
-
 dos(params::DOS_presets) =
     dos(params.h, params.computation.xbounds, params.computation.ybounds, 
     params.computation.ωlist, η = params.computation.broadening, evals =
@@ -22,7 +21,7 @@ end
 function integral_dos(ωlist::Array, h, xbounds, ybounds, η, evals)
     integrand(q) = dos_ω(ωlist, h, q, η)
     bz_vol = (1/(2pi))^(length(xbounds)) 
-    return bz_vol .* bz_integration(integrand, xbounds, ybounds, ωlist, evals)
+    return bz_vol .* bz_integration_optical(integrand, xbounds, ybounds, ωlist, evals)
 end
 
 function dos_ω(ωlist::Array, h, q, η)
@@ -54,7 +53,7 @@ end
 function integral_jdos(ωlist::Array, h, xbounds, ybounds, η, evals)
     integrand(q) = jdos_ω(ωlist, h, q, η)
     bz_vol = (1/(2pi))^(length(xbounds)) 
-    return bz_vol .* bz_integration(integrand, xbounds, ybounds, ωlist, evals)
+    return bz_vol .* bz_integration_optical(integrand, xbounds, ybounds, ωlist, evals)
 end
 
 function jdos_ω(ωlist::Array, h, q, η)

@@ -49,7 +49,7 @@ end
     h::Function # Hamiltonian H(k)
     nabla_h::Function # ∇_k H(k)
     nabla_nabla_h::Function #∂^2/∂i^2 H(k) with i = x or y (planar)
-    rz::Union{Matrix,Function}
+    rz::Union{Function} # even thought it is generally independent on q, pass it in the form rz(q, ψ)
     τ::Float64 # scattering time
     T::Number # Temperature in K
     computation::Union{Optical_computation_presets, Transport_computation_presets}

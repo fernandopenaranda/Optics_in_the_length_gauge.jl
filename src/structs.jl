@@ -34,7 +34,6 @@ end
     computation::Union{Optical_computation_presets, Optical_computation_presets}
 end
 
-
 @with_kw struct σij_presets
     dirJ::Symbol # i'th direction of σij
     dirE::Symbol # j'th direction of σij

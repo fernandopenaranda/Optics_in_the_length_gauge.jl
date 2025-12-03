@@ -62,7 +62,7 @@ function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, μ, T;
         return real(sum(d_f(ϵs, 0, T) .*
             (omm_switch .* mr_omm(i, j, omega, rx, ry, vx, vy, Δx, Δy, rzmat) + 
             Ω_switch .* mr_Ω(i, j, k, rzmat, rx, ry, vx, vy) + 
-            - mr_vij(i, vy, rzmat, vxx))))                                              #only valid in the xx direction
+            - omm_switch .* mr_vij(i, vy, rzmat, vxx))))                                              #only valid in the xx direction
     end
 end
 
@@ -82,7 +82,7 @@ end
 """"
 correction due to switching into the canonical ensemble
 """
-vij_shift(ϵs, T, vij) = sum(d_f(ϵs, 0, T) .* real(diag(vij)))
+vij_shift(ϵs, T, vij) = sum(d_f(ϵs, 0, T) .* real(diag(vij))) #check this
 mr_vij(i, vj,rz, vij) = real(OMM(i, vj, rz) .* diag(vij))
 
 δμ_shift(i, ϵs, T, vj, rj, rz) = sum(d_f(ϵs, 0, T) .* (OMM(i, vj, rz)) + 

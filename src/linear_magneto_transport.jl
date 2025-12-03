@@ -1,5 +1,6 @@
 """
     Hamiltonian in eV
+    Units: [σxx]/[B]
     returns the symmetric σxxx linear magneto conductivity conductivity
     `linear_magneto_conductivity(params::planar_σijk_presets)``
     Input params see structs.jl:

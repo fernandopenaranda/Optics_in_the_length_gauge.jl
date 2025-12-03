@@ -22,7 +22,6 @@ xbounds and y bounds have to be adimensional
 up to a bz_surface = (1/(2pi))^d with d = 2, 3
 """
 function bz_integration_transport(f, xbounds, ybounds, evals; rel_tol = 1e-5, abs_tol = 0) 
-    println("maximum number of evaluations: ", evals)
     val, _ = Cubature.hcubature(f, [xbounds[1], ybounds[1]], [xbounds[2], ybounds[2]];
         reltol = rel_tol, abstol= abs_tol, maxevals= evals);
     return val

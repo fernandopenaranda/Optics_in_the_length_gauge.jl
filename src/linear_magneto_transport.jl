@@ -59,11 +59,10 @@ function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, μ, T;
     if fermi_surface == true
         return sum(d_f(ϵs, 0, T))
     else
-        return sum(d_f(ϵs, 0, T))
-        # return sum(d_f(ϵs, 0, T) .*
-        #     (omm_switch .* mr_omm(i, j, omega, rx, ry, vx, vy, Δx, Δy, rzmat) + 
-        #     Ω_switch .* mr_Ω(i, j, k, rzmat, rx, ry, vx, vy) + 
-        #     - mr_vij(i, vy, rzmat, vxx)))                                                  #only valid in the xx direction
+        return sum(d_f(ϵs, 0, T) .*
+            (omm_switch .* mr_omm(i, j, omega, rx, ry, vx, vy, Δx, Δy, rzmat) + 
+            Ω_switch .* mr_Ω(i, j, k, rzmat, rx, ry, vx, vy) + 
+            - 0*mr_vij(i, vy, rzmat, vxx)))                                                  #only valid in the xx direction
     end
 end
 

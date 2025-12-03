@@ -9,7 +9,7 @@ function zop(dim)
     return  3.3/2 .* vcat(ones(dim2), -1 .* ones(dim2))       # 3.3 Å = interlayer distance                                            
 end
 
-function r_covariant(omega, ra, Δa, rb, Δb)                                    # Units: Å^2
+function r_covariant(omega, ra, Δa, rb, Δb)                                       # Units: Å^2
     raa_cov = zeros(ComplexF64, size(ra,1), size(ra,1))#similar(ra)
     dim = size(omega, 1) 
     for n in 1:dim
@@ -18,12 +18,14 @@ function r_covariant(omega, ra, Δa, rb, Δb)                                   
                 aux = 0
                 for p in 1:dim
                     if p != n && p != m
-                        aux += 1im * (omega[n,p]*ra[n,p]*rb[p,m] - omega[p,m]*rb[n,p]*ra[p,m]) # Units: eV * Å * Å 
+                        aux += 1im * (omega[n,p]*ra[n,p]*rb[p,m] - 
+                                        omega[p,m]*rb[n,p]*ra[p,m])            # Units: eV * Å * Å 
                     else
                         aux += 0
                     end
                 end
-                raa_cov[n,m] = -((ra[n,m] * Δb[n,m] + rb[n,m] * Δa[n,m]) + aux)/omega[n,m] # Units: (Å * Å * eV) / eV
+                raa_cov[n,m] = - ((ra[n,m] * Δb[n,m] + rb[n,m] * Δa[n,m])
+                               + aux)/omega[n,m]                            # Units: (Å * Å * eV) / eV
             else 
                 nothing
             end
@@ -100,9 +102,13 @@ function f!(mat, ϵs, μ, T, tol = 1e10)
     mat .*= f(ϵs, μ, T)
 end
 
-f(ϵs, μ, T) = [fn(ϵs[i], μ, T) - fn(ϵs[j], μ, T) for i in 1:length(ϵs), j in 1:length(ϵs)]
+#_________________________________________________________________________________________
+# FERMI FUNCTION AND ITS DERIVATIVES
+#_________________________________________________________________________________________
 
+f(ϵs, μ, T) = [fn(ϵs[i], μ, T) - fn(ϵs[j], μ, T) for i in 1:length(ϵs), j in 1:length(ϵs)]
 fn(ϵn,μ::Float64) = ifelse(ϵn < μ, 1.0, 0.0)
+
 function fn(ϵn, μ, T)
     if T == 0
         return ifelse(ϵn < μ, 1.0, 0.0)
@@ -110,6 +116,10 @@ function fn(ϵn, μ, T)
         return 1/(exp((ϵn - μ)/(kB * T)) + 1)
     end
 end
+d_fn(ϵn, μ, T) = -1/(kB*T) * fn(ϵn, μ, T) * (1-fn(ϵn, μ, T)) 
+d_f(ϵs, μ, T) = [d_fn(ϵn, μ, T) for ϵn in ϵs]
+
+
     
 #-------------------------------------------------------------------------------------------
 # Aux operations

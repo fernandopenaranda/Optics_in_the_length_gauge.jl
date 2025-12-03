@@ -21,8 +21,8 @@ linear_magneto_conductivity(params::Planar_σijk_presets) =
 
 function linear_magneto_conductivity(i,j,k, h, dh, ddh, rz, τ, T, Ω_contr, omm_contr, #N
     fermi_surface, with_shift, xbounds, ybounds, evals; rel_tol = 1e-5, abs_tol = 0)
-    integrand(q) = k_linear_magneto_conductivity(i, j, k, h, dh, ddh, rz, q; T = T, τ = τ, 
-        Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface, with_shift = with_shift)  
+    integrand(q) = real(k_linear_magneto_conductivity(i, j, k, h, dh, ddh, rz, q; T = T, τ = τ, 
+        Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface, with_shift = with_shift)) 
     val = bz_integration_transport(integrand, xbounds, ybounds, evals, rel_tol = rel_tol, abs_tol = abs_tol)
     bz_vol = (1/(2pi*ang_to_m^2))^(length(xbounds))
     return bz_vol * val 

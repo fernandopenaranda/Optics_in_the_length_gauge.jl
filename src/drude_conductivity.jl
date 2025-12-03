@@ -11,7 +11,7 @@ drude_conductivity(p::Drude_presets) = drude_conductivity(p.h, p.dhi, p.T, p.τ,
 
 function drude_conductivity(h, dh, T, τ, xbounds, ybounds, evals; rel_tol = 1e-5, abs_tol = 0)
     C = 2π * τ * ħ_ev_s
-    integrand(q) = k_in_plane_bindependent_conductivity(h(q), dh(q), T)
+    integrand(q) = real(k_in_plane_bindependent_conductivity(h(q), dh(q), T))
     val = bz_integration_transport(integrand, xbounds, ybounds, evals; rel_tol = rel_tol, abs_tol = abs_tol)
     return C * val
 end

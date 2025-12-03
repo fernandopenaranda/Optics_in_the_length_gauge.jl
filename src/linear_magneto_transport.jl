@@ -21,8 +21,8 @@ linear_magneto_conductivity(params::Planar_σijk_presets) =
 
 function linear_magneto_conductivity(i,j,k, h, dh, ddh, rz, τ, T, Ω_contr, omm_contr, #N
     fermi_surface, with_shift, xbounds, ybounds, evals; rel_tol = 1e-5, abs_tol = 0)
-    integrand(q) = real(k_linear_magneto_conductivity(i, j, k, h, dh, ddh, rz, q; T = T, τ = τ, 
-        Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface, with_shift = with_shift)) 
+    integrand(q) = k_linear_magneto_conductivity(i, j, k, h, dh, ddh, rz, q; T = T, τ = τ, 
+        Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface, with_shift = with_shift) 
     val = bz_integration_transport(integrand, xbounds, ybounds, evals, rel_tol = rel_tol, abs_tol = abs_tol)
     bz_vol = (1/(2pi*ang_to_m^2))^(length(xbounds))
     return bz_vol * val 
@@ -31,7 +31,7 @@ end
 function k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, ddhi, rz::Function, q; 
         T = 2, τ = 1e-15, Ω_contr = true, omm_contr = true, fermi_surface = false, with_shift = true)
     ϵs, ψs = eigen(Matrix(h(q)))                                                                           # check the 1e3!!!!!!!!
-    C = 1e3 * 2π * τ                                       
+    C = 2π * τ                                       
     σxxx = C * k_linear_mr_integrand(i, j, k, ϵs, ψs, rz(q, ψs), dh(q)[1], dh(q)[2], ddhi(q), 0, T,           
         Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface)                           # generalize to σyyy too   
     if with_shift == false                                                               
@@ -59,10 +59,11 @@ function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, μ, T;
     if fermi_surface == true
         return sum(d_f(ϵs, 0, T))
     else
-        return sum(d_f(ϵs, 0, T) .*
-            (omm_switch .* mr_omm(i, j, omega, rx, ry, vx, vy, Δx, Δy, rzmat) + 
-            Ω_switch .* mr_Ω(i, j, k, rzmat, rx, ry, vx, vy) + 
-            - mr_vij(i, vy, rzmat, vxx)))                                                  #only valid in the xx direction
+        return sum(d_f(ϵs, 0, T))
+        # return sum(d_f(ϵs, 0, T) .*
+        #     (omm_switch .* mr_omm(i, j, omega, rx, ry, vx, vy, Δx, Δy, rzmat) + 
+        #     Ω_switch .* mr_Ω(i, j, k, rzmat, rx, ry, vx, vy) + 
+        #     - mr_vij(i, vy, rzmat, vxx)))                                                  #only valid in the xx direction
     end
 end
 

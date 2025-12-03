@@ -23,7 +23,7 @@ function linear_optical_conductivity(dirJ::Symbol, dirE::Symbol, h::Function, dh
         dirJ, dirE, h, dh, xbounds, ybounds, η, evals)
     conds[half_dim+1:length(ωlist)] .= integral_linear(ωlist[half_dim+1:length(ωlist)],
         dirJ, dirE, h, dh, xbounds, ybounds, η, evals)
-    return ωlist, π * conds #units of e^2/(16ħ)
+    return ωlist, π * conds # units of e^2/(16ħ)
 end
 
 function integral_linear(ωlist::Array, dirJ, dirE, h, dh, xbounds, ybounds, η, evals)

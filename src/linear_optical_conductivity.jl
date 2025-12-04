@@ -10,7 +10,7 @@
     `ωlist::Vector` frequency list of the incoming radiation
 """
 linear_optical_conductivity(params::σij_presets) =
-    linear_optical_conductivity(params.a0, params.dirJ, params.dirE, params.h, params.nabla_h,
+    linear_optical_conductivity(params.dirJ, params.dirE, params.h, params.nabla_h,
     params.computation.xbounds, params.computation.ybounds, 
     params.computation.ωlist, η = params.computation.broadening, 
     evals = params.computation.evals)

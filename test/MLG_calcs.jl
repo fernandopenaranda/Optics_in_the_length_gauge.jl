@@ -39,5 +39,4 @@ end
     @test does_not_throw(linear_optical_conductivity, sigma_ij_presets)
     @test does_not_throw(drude_conductivity, drude_xx_presets)
     @test does_not_throw(linear_magneto_conductivity, planar_σijk_presets)
-
 end

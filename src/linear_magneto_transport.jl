@@ -25,13 +25,13 @@ function linear_magneto_conductivity(i,j,k, h, dh, ddh, rz, τ, T, Ω_contr, omm
     integrand(q) = k_linear_magneto_conductivity(i, j, k, h, dh, ddh, rz, q; T = T, τ = τ, 
         Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface, with_shift = with_shift) 
     val = bz_integration_transport(integrand, xbounds, ybounds, evals, rel_tol = rel_tol, abs_tol = abs_tol)
-    bz_vol = (1/(2pi*ang_to_m^2))^(length(xbounds))
-    return bz_vol * val 
+    bz_vol = (1/(2pi*ang_to_m))^(length(xbounds))                                                              
+    return bz_vol * val
 end
 
 function k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, ddhi, rz::Function, q; 
-        T = 2, τ = 1e-15, Ω_contr = true, omm_contr = true, fermi_surface = false, with_shift = true)
-    ϵs, ψs = eigen(Matrix(h(q)))                                                                           # check the 1e3!!!!!!!!
+    T = 2, τ = 1e-15, Ω_contr = true, omm_contr = true, fermi_surface = false, with_shift = true)
+    ϵs, ψs = eigen(Matrix(h(q)))                                                                          
     C = 2π * τ                                       
     σxxx = C * k_linear_mr_integrand(i, j, k, ϵs, ψs, rz(q, ψs), dh(q)[1], dh(q)[2], ddhi(q), 0, T,           
         Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface)                           # generalize to σyyy too   

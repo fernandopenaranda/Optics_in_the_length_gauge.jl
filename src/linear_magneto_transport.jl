@@ -150,7 +150,7 @@ function mr_corr() #not sure if it vanishes due to vij. Lets not include it for 
     ε()
 end
 # ----------------------------------------------------------------------------------------
-#              Berry curvature, orbital magnetic moment and its derivative
+#             planar Berry curvature, orbital magnetic moment and its derivative
 # ----------------------------------------------------------------------------------------
 """
     Ωin(ϵs, ψs, dh, k)
@@ -158,6 +158,7 @@ computes the in-plane Berry curvature
 Ω^α = 2ħ ϵ^{ij} Re[Σ_n'≠n -iv_{nn'}^j * z_{n'n} / ω_{nn'}]      
 """
 Ωin(i, rj, rz) = 2ε(i) * imag(Σ_nondiag(rj, rz))
+
 """
     Planar orbital magnetic momentum: OMM                          UNITS e
     one hbar comes from v and the other from the definition of OMM

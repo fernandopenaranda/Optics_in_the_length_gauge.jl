@@ -26,6 +26,19 @@ end
     computation::Union{Optical_computation_presets, Transport_computation_presets}
 end
 
+
+@with_kw struct σij_presets
+    a0::Float64
+    dirJ::Symbol # i'th direction of σij
+    dirE::Symbol # j'th direction of σij
+    h::Function # Hamiltonian H(k)
+    nabla_h::Function # ∇_k H(k)
+    computation::Union{Optical_computation_presets, Transport_computation_presets}
+end
+
+
+# TRANSPORT 
+
 @with_kw struct Drude_presets
     a0::Float64
     dirJ::Symbol # i'th direction of σij
@@ -37,12 +50,13 @@ end
     computation::Union{Optical_computation_presets, Transport_computation_presets}
 end
 
-@with_kw struct σij_presets
+@with_kw struct AH_presets
     a0::Float64
-    dirJ::Symbol # i'th direction of σij
-    dirE::Symbol # j'th direction of σij
+    dirJ::Symbol # i'th direction of σij in i = {x, y}
+    dirE::Symbol # j'th direction of σij in j = {y, x}
     h::Function # Hamiltonian H(k)
-    nabla_h::Function # ∇_k H(k)
+    dh::Function # x, y, k-derivative of H(k): [dhx, dhy]
+    T::Float64
     computation::Union{Optical_computation_presets, Transport_computation_presets}
 end
 

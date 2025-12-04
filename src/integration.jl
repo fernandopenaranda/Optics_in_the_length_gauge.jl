@@ -8,6 +8,9 @@ xbounds and y bounds have to be adimensional
 up to a bz_surface = (1/(2pi))^d with d = 2, 3.
 which is included when calling bz_integration_functs...
 """
+bz_integration_optical(f, p::Optical_computation_presets; kws...) = 
+    bz_integration_optical(f, p.xbounds, p.ybounds, p.ωlist, p.evals; kws...) 
+
 function bz_integration_optical(f, xbounds, ybounds, ωlist, evals; rel_tol = 1e-5, abs_tol = 0) 
     val, _ = Cubature.hcubature(length(ωlist), (x,v) -> v[:] = f(x), 
         [xbounds[1], ybounds[1]], [xbounds[2], ybounds[2]]; reltol = rel_tol, abstol= abs_tol, maxevals=Int(evals));
@@ -22,6 +25,9 @@ it assumes a rectangular BZ.
 xbounds and y bounds have to be adimensional
 up to a bz_surface = (1/(2pi))^d with d = 2, 3
 """
+bz_integration_transport(f, p::Transport_computation_presets; kws...) = 
+    bz_integration_transport(f, p.xbounds, p.ybounds, p.evals; kws...) 
+
 function bz_integration_transport(f, xbounds, ybounds, evals; rel_tol = 1e-5, abs_tol = 0) 
     val, _ = Cubature.hcubature(f, [xbounds[1], ybounds[1]], [xbounds[2], ybounds[2]];
         reltol = rel_tol, abstol= abs_tol, maxevals= Int(evals));

@@ -25,7 +25,6 @@ function k_in_plane_bindependent_conductivity(h, dhi, T)
     vi = vel(ψs, dhi) * ang_to_m/ ħ_ev_s
     sum(d_f(ϵs, 0, T) .* real(diag(vi)).^2)
 end
-
 """
     k_linear_magnetorresistance
 integrand of σ_ijk with all the prefactors

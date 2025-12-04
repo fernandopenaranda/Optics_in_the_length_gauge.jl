@@ -25,8 +25,14 @@ function linear_magneto_conductivity(a0, i,j,k, h, dh, ddh, rz, τ, T, Ω_contr,
     integrand(q) = k_linear_magneto_conductivity(i, j, k, h, dh, ddh, rz, q; T = T, τ = τ, 
         Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface, with_shift = with_shift) 
     val = bz_integration_transport(integrand, xbounds, ybounds, evals, rel_tol = rel_tol, abs_tol = abs_tol)
-    bz_vol = (1/(2pi*a0*ang_to_m))^(length(xbounds))                                                              
-    return bz_vol * val
+    bz_vol = (1/(2pi*a0*ang_to_m))^(length(xbounds))
+    if with_shift == false                                                              
+        return bz_vol * val
+    else 
+        # densityofstates(q) = 
+        # fs_vxx(q) = 
+        # qah(q) = 
+    end
 end
 
 function k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, ddhi, rz::Function, q; 
@@ -68,6 +74,11 @@ function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T;
     end
 end
 
+
+function densityofstates()
+
+end
+
 """shift correction due to the magnetic field effect on the bandstructure"""
 function k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T; fermi_surface = false)
     ry = r(ϵs, ψs, dhy) * ang_to_m
@@ -77,9 +88,14 @@ function k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T
     if fermi_surface == true
         return sum(d_f(ϵs, 0, T))
     else
-        δμ_shift(i, ϵs, T, vy, ry, rzmat) * vij_shift(ϵs, T, vxx)/sum(d_f(ϵs, 0, T))
+        # δμ_shift(i, ϵs, T, vy, ry, rzmat) * vij_shift(ϵs, T, vxx)/sum(d_f(ϵs, 0, T))
     end
 end
+
+"""
+correction due to switchin in the cannonical ensemble
+"""
+
 
 """"
 correction due to switching into the canonical ensemble
@@ -89,10 +105,7 @@ vij_shift(ϵs, T, vij) = sum(d_f(ϵs, 0, T) .* real(diag(vij))) #check this
 correction due to switching into the canonical ensemble
 """
 mr_vij(i, vj,rz, vij) = real(OMM(i, vj, rz) .* diag(vij))
-""""
-correction due to switching into the canonical ensemble. Note it has a part that 
-depends on OMM and another one on Ωi.
-"""
+
 function δμ_shift(i, ϵs, T, vj, rj, rz; Ω_contr = true, omm_contr = true) 
     Ω_switch = ifelse(Ω_contr == true, 1, 0)
     omm_switch = ifelse(omm_contr == true, 1, 0)

@@ -1,3 +1,4 @@
+# Note units h in eV, dh in eV * Å
 module Optics_in_the_length_gauge
     using Arpack
     using LinearAlgebra

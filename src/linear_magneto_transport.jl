@@ -34,7 +34,7 @@ function k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, d
     ϵs, ψs = eigen(Matrix(h(q)))                                                                          
     C = 2π * τ                                       
     σxxx = C * k_linear_mr_integrand(i, j, k, ϵs, ψs, rz(q, ψs), dh(q)[1], dh(q)[2], ddhi(q), 0, T,           
-        Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface)                           # generalize to σyyy too   
+        Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface)           # generalize to σyyy too   
     if with_shift == false                                                               
         return σxxx
     else
@@ -45,7 +45,7 @@ end
 
 "the term with vij is only valid for sigma xxx"
 function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, μ, T;
-         Ω_contr = true, omm_contr = true, fermi_surface = false)                       # units meters, meV, seconds
+         Ω_contr = true, omm_contr = true, fermi_surface = false)                       # units meters, eV, seconds
     omega = Ω(ϵs)
     Δx = Δ(ψs, dhx) * ang_to_m
     Δy = Δ(ψs, dhy) * ang_to_m
@@ -63,7 +63,7 @@ function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, μ, T;
         return real(sum(d_f(ϵs, 0, T) .*
             (omm_switch .* mr_omm(i, j, omega, rx, ry, vx, vy, Δx, Δy, rzmat) + 
             Ω_switch .* mr_Ω(i, j, k, rzmat, rx, ry, vx, vy) + 
-            - omm_switch .* mr_vij(i, vy, rzmat, vxx))))                                              #only valid in the xx direction
+            - omm_switch .* mr_vij(i, vy, rzmat, vxx))))                              #only valid in the xx direction
     end
 end
 

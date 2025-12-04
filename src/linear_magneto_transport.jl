@@ -33,18 +33,18 @@ function k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, d
     T = 2, τ = 1e-15, Ω_contr = true, omm_contr = true, fermi_surface = false, with_shift = true)
     ϵs, ψs = eigen(Matrix(h(q)))                                                                          
     C = 2π * τ                                       
-    σxxx = C * k_linear_mr_integrand(i, j, k, ϵs, ψs, rz(q, ψs), dh(q)[1], dh(q)[2], ddhi(q), 0, T,           
+    σxxx = C * k_linear_mr_integrand(i, j, k, ϵs, ψs, rz(q, ψs), dh(q)[1], dh(q)[2], ddhi(q), T,           
         Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface)           # generalize to σyyy too   
     if with_shift == false                                                               
         return σxxx
     else
-        σxxx_shift = C * k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rz(q, ψs), dh(q)[1], dh(q)[2], ddhi(q), μ, T)
+        σxxx_shift = C * k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rz(q, ψs), dh(q)[1], dh(q)[2], ddhi(q), T)
         return σxxx + σxxx_shift  
     end                      
 end
 
 "the term with vij is only valid for sigma xxx"
-function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, μ, T;
+function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T;
          Ω_contr = true, omm_contr = true, fermi_surface = false)                       # units meters, eV, seconds
     omega = Ω(ϵs)
     Δx = Δ(ψs, dhx) * ang_to_m
@@ -68,7 +68,7 @@ function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, μ, T;
 end
 
 """shift correction due to the magnetic field effect on the bandstructure"""
-function k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, μ, T)
+function k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T)
     ry = r(ϵs, ψs, dhy) * ang_to_m
     rzmat *= ang_to_m
     vxx = vel(ψs, dhxx) * ang_to_m^2/ ħ_ev_s

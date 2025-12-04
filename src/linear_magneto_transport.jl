@@ -85,10 +85,20 @@ end
 correction due to switching into the canonical ensemble
 """
 vij_shift(ϵs, T, vij) = sum(d_f(ϵs, 0, T) .* real(diag(vij))) #check this
+""""
+correction due to switching into the canonical ensemble
+"""
 mr_vij(i, vj,rz, vij) = real(OMM(i, vj, rz) .* diag(vij))
-
-δμ_shift(i, ϵs, T, vj, rj, rz) = sum(d_f(ϵs, 0, T) .* (OMM(i, vj, rz)) + 
-   (Ωin(i, rj, rz)) .* f(ϵs, 0, T)/ħ_ev_s) #units 1/e m^2
+""""
+correction due to switching into the canonical ensemble. Note it has a part that 
+depends on OMM and another one on Ωi.
+"""
+function δμ_shift(i, ϵs, T, vj, rj, rz; Ω_contr = true, omm_contr = true) 
+    Ω_switch = ifelse(Ω_contr == true, 1, 0)
+    omm_switch = ifelse(omm_contr == true, 1, 0)
+    return sum(d_f(ϵs, 0, T) .* (omm_switch * OMM(i, vj, rz)) + 
+   (Ω_switch * Ωin(i, rj, rz)) .* f(ϵs, 0, T)/ħ_ev_s) #units 1/e m^2
+end
 
 # ----------------------------------------------------------------------------------------
 #           Magnetorresistance integrand terms: m_Ω, m_OMM, and n-fixing correction

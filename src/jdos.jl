@@ -30,6 +30,12 @@ function dos_ω(ωlist::Array, h, q, η)
     return [sum((1/π * η) ./ ((ω .- ϵs).^2 .+ η^2) ) for ω in ωlist]  
 end
 
+function alt_dos(h, q, T)
+    ϵs, = eigen(Matrix(h(q)))
+    return sum(d_f(ϵs, 0, T))
+end
+
+
 """ `jdos(h, xbounds, ybounds, ωlist; kws...)`
 Note that the fermi level is passed on h, thus the functions do not depend on μ.
 Computes the joint density of states, provided a Hamiltonian function with momentum dependence h(\vec k),

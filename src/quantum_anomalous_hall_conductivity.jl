@@ -7,6 +7,11 @@ where f is the occupation function (temperature dependent),
 and ϵ_ij = {1 if i = x, j = y, -1if i = y, j = x, 0 otherwise }
 
 """
+σij_anomalous_hall(params::Planar_σijk_presets) = 
+    σij_anomalous_hall(params.a0, params.dirJ, params.dirE,
+    params.h, params.dh, params.T, params.computation)
+
+
 σij_anomalous_hall(params::AH_presets) = 
     σij_anomalous_hall(params.a0, params.dirJ, params.dirE,
     params.h, params.dh, params.T, params.computation)

@@ -18,22 +18,33 @@ linear_magneto_conductivity(params::Planar_σijk_presets) =
         params.dirJ, params.dirE, params.dirB, params.h, params.nabla_h, 
         params.nabla_nabla_h, params.rz, params.τ, params.T,
         params.berry_contribution, params.omm_contribution, params.fermi_surface, params.with_shift,
-        params.computation.xbounds, params.computation.ybounds, params.computation.evals)
+        params.computation)
 
 function linear_magneto_conductivity(a0, i,j,k, h, dh, ddh, rz, τ, T, Ω_contr, omm_contr, #N
-    fermi_surface, with_shift, xbounds, ybounds, evals; rel_tol = 1e-5, abs_tol = 0)
+    fermi_surface, with_shift, cpt; rel_tol = 1e-5, abs_tol = 0)
+    
     integrand(q) = k_linear_magneto_conductivity(i, j, k, h, dh, ddh, rz, q; T = T, τ = τ, 
         Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface, with_shift = with_shift) 
-    val = bz_integration_transport(integrand, xbounds, ybounds, evals, rel_tol = rel_tol, abs_tol = abs_tol)
-    bz_vol = 1/(2pi*a0*ang_to_m)^length(xbounds)
+    integrator(observable) = bz_integration_transport(observable, cpt, rel_tol = rel_tol, abs_tol = abs_tol)
+    bz_vol = 1/(2pi*a0*ang_to_m)^length(cpt.xbounds)
+    val = bz_vol * integrator(integrand)
+    
     if with_shift == false                                                              
-        return bz_vol * val
+        return val
     else 
-        # densityofstates(q) = 
-        # fs_vxx(q) = 
-        # qah(q) = 
+    
+        densityofstates(q) = alt_dos(h, q, T)
+        pseudo_qah(q) = k_Ωi_fs(i, j, h, dh, rz, q, T) # it is pseudo because Ω is in the plane
+        fs_vxx(q) = vij_shift(h, ddh, q, T)
+
+        val_dos = bz_vol * integrator(densityofstates)
+        val_qah = bz_vol * integrator(pseudo_qah)
+        val_fs_vxx = bz_vol * integrator(fs_vxx)
+        discardnan(x) = isnan(x) ? 0 : x
+        return val + discardnan(τ/val_dos * val_fs_vxx * val_qah)  #note that val is multiplied also by τ
     end
-end
+end 
+# tenemos un problema, \Omega tiene que estar en el plano porque viene del producto escalar con B
 
 function k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, ddhi, rz::Function, q; 
     T = 2, τ = 1e-15, Ω_contr = true, omm_contr = true, fermi_surface = false, with_shift = true)
@@ -41,13 +52,7 @@ function k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, d
     C = 2π * τ                                       
     σxxx = C * k_linear_mr_integrand(i, j, k, ϵs, ψs, rz(q, ψs), dh(q)[1], dh(q)[2], ddhi(q), T,           
         Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface)           # generalize to σyyy too   
-    if with_shift == false                                                               
-        return σxxx
-    else
-        σxxx_shift = C * k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rz(q, ψs), dh(q)[1], dh(q)[2], ddhi(q), T
-            , fermi_surface = fermi_surface)
-        return σxxx + σxxx_shift  
-    end                      
+    return σxxx
 end
 
 "the term with vij is only valid for sigma xxx"
@@ -76,32 +81,27 @@ function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T;
 end
 
 
-function densityofstates()
-
-end
-
-"""shift correction due to the magnetic field effect on the bandstructure"""
-function k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T; fermi_surface = false)
-    ry = r(ϵs, ψs, dhy) * ang_to_m
-    rzmat *= ang_to_m
-    vxx = vel(ψs, dhxx) * ang_to_m^2/ ħ_ev_s
-    vy = vel(ψs, dhy) * ang_to_m/ ħ_ev_s
-    if fermi_surface == true
-        return sum(d_f(ϵs, 0, T))
-    else
-        # δμ_shift(i, ϵs, T, vy, ry, rzmat) * vij_shift(ϵs, T, vxx)/sum(d_f(ϵs, 0, T))
-    end
-end
-
-"""
-correction due to switchin in the cannonical ensemble
-"""
-
-
+# """shift correction due to the magnetic field effect on the bandstructure"""
+# function k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T; fermi_surface = false)
+#     ry = r(ϵs, ψs, dhy) * ang_to_m
+#     rzmat *= ang_to_m
+#     vxx = vel(ψs, dhxx) * ang_to_m^2/ ħ_ev_s
+#     vy = vel(ψs, dhy) * ang_to_m/ ħ_ev_s
+#     if fermi_surface == true
+#         return sum(d_f(ϵs, 0, T))
+#     else
+#         # δμ_shift(i, ϵs, T, vy, ry, rzmat) * vij_shift(ϵs, T, vxx)/sum(d_f(ϵs, 0, T))
+#     end
+# end
 """"
 correction due to switching into the canonical ensemble
 """
-vij_shift(ϵs, T, vij) = sum(d_f(ϵs, 0, T) .* real(diag(vij))) #check this
+function vij_shift(h, dhxx, q, T)
+    ϵs, ψs = eigen(Matrix(h(q)))
+    vxx = vel(ψs, dhxx(q)) * ang_to_m^2/ ħ_ev_s
+    return vij_shift(ϵs, T, vxx)
+end
+vij_shift(ϵs, T, vij) = sum(d_f(ϵs, 0, T) .* real(diag(vij))) #check this, maybe here we have a sum
 """"
 correction due to switching into the canonical ensemble
 """
@@ -144,6 +144,13 @@ function mr_Ω(i, j, k, rz, rx, ry, vx, vy)
     return real((diag(vi) .* diag(vj) .* Ωin(k, r_not_k, rz) .- 
             (δ_kron(j,k) .* diag(vi) .+ δ_kron(i,k) .* diag(vj)) .* 
             (diag(vx) .* Ωin(:x, ry, rz) .+ diag(vy) .* Ωin(:y, rx, rz)))) # this is real diag(vx) is in R
+end
+
+function k_Ωi_fs(i, j, h, dh, rz, q, T)
+    ϵs, ψs = eigen(Matrix(h(q)))
+    rzmat = rz(q, ψs) .* ang_to_m     
+    rj = r(ϵs, ψs, dh(q)[which_ind(j)]) .* ang_to_m
+    return sum(f(ϵs, 0, T) .* Ωin(i, rj, rzmat))
 end
 
 function mr_corr() #not sure if it vanishes due to vij. Lets not include it for now

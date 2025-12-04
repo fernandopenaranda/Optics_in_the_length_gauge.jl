@@ -38,7 +38,8 @@ function k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, d
     if with_shift == false                                                               
         return σxxx
     else
-        σxxx_shift = C * k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rz(q, ψs), dh(q)[1], dh(q)[2], ddhi(q), T)
+        σxxx_shift = C * k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rz(q, ψs), dh(q)[1], dh(q)[2], ddhi(q), T
+            , fermi_surface = fermi_surface)
         return σxxx + σxxx_shift  
     end                      
 end
@@ -68,7 +69,7 @@ function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T;
 end
 
 """shift correction due to the magnetic field effect on the bandstructure"""
-function k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T)
+function k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T; fermi_surface = false)
     ry = r(ϵs, ψs, dhy) * ang_to_m
     rzmat *= ang_to_m
     vxx = vel(ψs, dhxx) * ang_to_m^2/ ħ_ev_s

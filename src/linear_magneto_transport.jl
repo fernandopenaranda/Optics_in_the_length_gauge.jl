@@ -25,7 +25,7 @@ function linear_magneto_conductivity(a0, i,j,k, h, dh, ddh, rz, τ, T, Ω_contr,
     integrand(q) = k_linear_magneto_conductivity(i, j, k, h, dh, ddh, rz, q; T = T, τ = τ, 
         Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface, with_shift = with_shift) 
     val = bz_integration_transport(integrand, xbounds, ybounds, evals, rel_tol = rel_tol, abs_tol = abs_tol)
-    bz_vol = (1/(2pi*a0*ang_to_m))^(length(xbounds))
+    bz_vol = 1/(2pi*a0*ang_to_m)^length(xbounds)
     if with_shift == false                                                              
         return bz_vol * val
     else 
@@ -53,20 +53,21 @@ end
 "the term with vij is only valid for sigma xxx"
 function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T;
          Ω_contr = true, omm_contr = true, fermi_surface = false)                       # units meters, eV, seconds
-    omega = Ω(ϵs)
-    Δx = Δ(ψs, dhx) * ang_to_m
-    Δy = Δ(ψs, dhy) * ang_to_m
-    rx = r(ϵs, ψs, dhx) * ang_to_m
-    ry = r(ϵs, ψs, dhy) * ang_to_m
-    vx = vel(ψs, dhx) * ang_to_m/ ħ_ev_s
-    vy = vel(ψs, dhy) * ang_to_m/ ħ_ev_s
-    vxx = vel(ψs, dhxx) * ang_to_m^2/ ħ_ev_s
-    rzmat *= ang_to_m
-    Ω_switch = ifelse(Ω_contr == true, 1, 0)
-    omm_switch = ifelse(omm_contr == true, 1, 0)
     if fermi_surface == true
         return sum(d_f(ϵs, 0, T))
     else
+        omega = Ω(ϵs)
+        Δx = Δ(ψs, dhx) * ang_to_m
+        Δy = Δ(ψs, dhy) * ang_to_m
+        rx = r(ϵs, ψs, dhx) * ang_to_m
+        ry = r(ϵs, ψs, dhy) * ang_to_m
+        vx = vel(ψs, dhx) * ang_to_m/ ħ_ev_s
+        vy = vel(ψs, dhy) * ang_to_m/ ħ_ev_s
+        vxx = vel(ψs, dhxx) * ang_to_m^2/ ħ_ev_s
+        rzmat *= ang_to_m
+        Ω_switch = ifelse(Ω_contr == true, 1, 0)
+        omm_switch = ifelse(omm_contr == true, 1, 0)
+
         return real(sum(d_f(ϵs, 0, T) .*
             (omm_switch .* mr_omm(i, j, omega, rx, ry, vx, vy, Δx, Δy, rzmat) + 
             Ω_switch .* mr_Ω(i, j, k, rzmat, rx, ry, vx, vy) + 

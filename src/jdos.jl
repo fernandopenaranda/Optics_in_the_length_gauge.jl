@@ -11,7 +11,7 @@ dos(params::DOS_presets) =
     params.computation.ωlist, η = params.computation.broadening, evals =
     params.computation.evals)
 
-function dos(a0, h, xbounds, ybounds, ωlist; η = 0.1, evals = 10000, kws...)
+function dos(a0, h, xbounds, ybounds, ωlist; η = 0.1, evals = 10000)
     dos = zeros(Float64, length(ωlist))
     half_dim = length(ωlist)÷2
     dos[1:half_dim] .= integral_dos(ωlist[1:half_dim], h, xbounds, ybounds, η, evals, a0)

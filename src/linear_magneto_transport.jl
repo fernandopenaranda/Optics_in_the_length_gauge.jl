@@ -96,8 +96,8 @@ depends on OMM and another one on Ωi.
 function δμ_shift(i, ϵs, T, vj, rj, rz; Ω_contr = true, omm_contr = true) 
     Ω_switch = ifelse(Ω_contr == true, 1, 0)
     omm_switch = ifelse(omm_contr == true, 1, 0)
-    return sum(d_f(ϵs, 0, T) .* (omm_switch * OMM(i, vj, rz)) + 
-   (Ω_switch * Ωin(i, rj, rz)) .* f(ϵs, 0, T)/ħ_ev_s) #units 1/e m^2
+    return sum(d_f(ϵs, 0, T) .* (omm_switch .* OMM(i, vj, rz)) + 
+    (Ω_switch .* Ωin(i, rj, rz)) .* f(ϵs, 0, T)/ħ_ev_s) #units 1/e m^2
 end
 
 # ----------------------------------------------------------------------------------------

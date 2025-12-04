@@ -10,25 +10,25 @@
     `ωlist::Vector` frequency list of the incoming radiation
 """
 linear_optical_conductivity(params::σij_presets) =
-    linear_optical_conductivity(params.dirJ, params.dirE, params.h, params.nabla_h,
+    linear_optical_conductivity(params.a0, params.dirJ, params.dirE, params.h, params.nabla_h,
     params.computation.xbounds, params.computation.ybounds, 
     params.computation.ωlist, η = params.computation.broadening, 
     evals = params.computation.evals)
 
-function linear_optical_conductivity(dirJ::Symbol, dirE::Symbol, h::Function, dh, xbounds, ybounds, 
+function linear_optical_conductivity(a0, dirJ::Symbol, dirE::Symbol, h::Function, dh, xbounds, ybounds, 
     ωlist; η = 0.1, evals = 10000, kws...)
     conds = zeros(Float64, length(ωlist))
     half_dim = length(ωlist)÷2
     conds[1:half_dim] .= integral_linear(ωlist[1:half_dim], 
-        dirJ, dirE, h, dh, xbounds, ybounds, η, evals)
+        dirJ, dirE, h, dh, xbounds, ybounds, η, evals, a0)
     conds[half_dim+1:length(ωlist)] .= integral_linear(ωlist[half_dim+1:length(ωlist)],
-        dirJ, dirE, h, dh, xbounds, ybounds, η, evals)
+        dirJ, dirE, h, dh, xbounds, ybounds, η, evals, a0)
     return ωlist, π * conds # units of e^2/(16ħ)
 end
 
-function integral_linear(ωlist::Array, dirJ, dirE, h, dh, xbounds, ybounds, η, evals)
+function integral_linear(ωlist::Array, dirJ, dirE, h, dh, xbounds, ybounds, η, evals, a0)
     integrand(q) = real(σab_linear_ω(ωlist, h(q), dh(q)[dir_to_ind(dirJ)], dh(q)[dir_to_ind(dirE)], η))
-    bz_vol = (1/(2pi))^(length(xbounds)) 
+    bz_vol = (1/(2pi*a0))^(length(xbounds)) 
     return bz_vol .* bz_integration_optical(integrand, xbounds, ybounds, ωlist, evals)
 end
 

@@ -5,7 +5,8 @@ f integrand, xbounds, ybounds
 it assumes a rectangular BZ. with frequency ω dependency
 
 xbounds and y bounds have to be adimensional
-up to a bz_surface = (1/(2pi))^d with d = 2, 3
+up to a bz_surface = (1/(2pi))^d with d = 2, 3.
+which is included when calling bz_integration_functs...
 """
 function bz_integration_optical(f, xbounds, ybounds, ωlist, evals; rel_tol = 1e-5, abs_tol = 0) 
     val, _ = Cubature.hcubature(length(ωlist), (x,v) -> v[:] = f(x), 

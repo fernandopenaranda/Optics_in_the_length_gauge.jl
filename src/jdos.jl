@@ -4,23 +4,24 @@ BZ bounds along the x (xbounds) and y (ybounds) direction.
 - `a` and `b` are the in-plane (:x, :y) directions.
 - `η` defines the energy broadening of the Lorentzian peaks.
 - `evals` sets the mesh size in the BZ integration
+length units are those of a0, so Å
 """
 dos(params::DOS_presets) =
-    dos(params.h, params.computation.xbounds, params.computation.ybounds, 
+    dos(params.a0, params.h, params.computation.xbounds, params.computation.ybounds, 
     params.computation.ωlist, η = params.computation.broadening, evals =
     params.computation.evals)
 
-function dos(h, xbounds, ybounds, ωlist; η = 0.1, evals = 10000, kws...)
+function dos(a0, h, xbounds, ybounds, ωlist; η = 0.1, evals = 10000, kws...)
     dos = zeros(Float64, length(ωlist))
     half_dim = length(ωlist)÷2
-    dos[1:half_dim] .= integral_dos(ωlist[1:half_dim], h, xbounds, ybounds, η, evals)
-    dos[half_dim+1:length(ωlist)] .= integral_dos(ωlist[half_dim+1:length(ωlist)], h, xbounds, ybounds, η, evals)
+    dos[1:half_dim] .= integral_dos(ωlist[1:half_dim], h, xbounds, ybounds, η, evals, a0)
+    dos[half_dim+1:length(ωlist)] .= integral_dos(ωlist[half_dim+1:length(ωlist)], h, xbounds, ybounds, η, evals, a0)
     return ωlist, dos
 end
 
-function integral_dos(ωlist::Array, h, xbounds, ybounds, η, evals)
+function integral_dos(ωlist::Array, h, xbounds, ybounds, η, evals, a0)
     integrand(q) = dos_ω(ωlist, h, q, η)
-    bz_vol = (1/(2pi))^(length(xbounds)) 
+    bz_vol = (1/(2pi*a0*ang_to_m))^(length(xbounds))    
     return bz_vol .* bz_integration_optical(integrand, xbounds, ybounds, ωlist, evals)
 end
 
@@ -36,23 +37,24 @@ BZ bounds along the x (xbounds) and y (ybounds) direction.
 - `a` and `b` are the in-plane (:x, :y) directions.
 - `η` defines the energy broadening of the Lorentzian peaks.
 - `evals` sets the mesh size in the BZ integration
+length units are those of a0, so m
 """
 jdos(params::JDOS_presets) =
-    jdos(params.h, params.computation.xbounds, params.computation.ybounds, 
+    jdos(params.a0, params.h, params.computation.xbounds, params.computation.ybounds, 
     params.computation.ωlist, η = params.computation.broadening, evals =
     params.computation.evals)
 
-function jdos(h, xbounds, ybounds, ωlist; η = 0.1, evals = 10000, kws...)
+function jdos(a0, h, xbounds, ybounds, ωlist; η = 0.1, evals = 10000, kws...)
     jdos = zeros(Float64, length(ωlist))
     half_dim = length(ωlist)÷2
-    jdos[1:half_dim] .= integral_jdos(ωlist[1:half_dim], h, xbounds, ybounds, η, evals)
-    jdos[half_dim+1:length(ωlist)] .= integral_jdos(ωlist[half_dim+1:length(ωlist)], h, xbounds, ybounds, η, evals)
+    jdos[1:half_dim] .= integral_jdos(ωlist[1:half_dim], h, xbounds, ybounds, η, evals, a0)
+    jdos[half_dim+1:length(ωlist)] .= integral_jdos(ωlist[half_dim+1:length(ωlist)], h, xbounds, ybounds, η, evals, a0)
     return ωlist, jdos
 end
 
-function integral_jdos(ωlist::Array, h, xbounds, ybounds, η, evals)
+function integral_jdos(ωlist::Array, h, xbounds, ybounds, η, evals, a0)
     integrand(q) = jdos_ω(ωlist, h, q, η)
-    bz_vol = (1/(2pi))^(length(xbounds)) 
+    bz_vol = (1/(2pi*a0*ang_to_m))^(length(xbounds))
     return bz_vol .* bz_integration_optical(integrand, xbounds, ybounds, ωlist, evals)
 end
 

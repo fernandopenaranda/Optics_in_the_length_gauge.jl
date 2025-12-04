@@ -15,16 +15,19 @@ end
 end
 
 @with_kw struct DOS_presets
+    a0::Float64
     h::Function # Hamiltonian H(k)
     computation::Union{Optical_computation_presets, Transport_computation_presets}
 end
 
 @with_kw struct JDOS_presets
+    a0::Float64
     h::Function # Hamiltonian H(k)
     computation::Union{Optical_computation_presets, Transport_computation_presets}
 end
 
 @with_kw struct Drude_presets
+    a0::Float64
     dirJ::Symbol # i'th direction of σij
     dirE::Symbol # j'th direction of σij
     h::Function # Hamiltonian H(k)
@@ -35,6 +38,7 @@ end
 end
 
 @with_kw struct σij_presets
+    a0::Float64
     dirJ::Symbol # i'th direction of σij
     dirE::Symbol # j'th direction of σij
     h::Function # Hamiltonian H(k)
@@ -43,6 +47,7 @@ end
 end
 
 @with_kw struct Planar_σijk_presets
+    a0::Float64
     dirJ::Symbol # i'th direction of σijk
     dirE::Symbol # j'th direction of σijk
     dirB::Symbol # k'th direction of σijk

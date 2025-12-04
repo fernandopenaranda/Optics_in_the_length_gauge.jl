@@ -1,4 +1,11 @@
-# Note units h in eV, dh in eV * Å
+# Important remark concerning units.
+
+# Note units h in eV
+# the k momentum xbounds and y bounds do not depend explicitly passed are adimiensional by a0
+# derivatives of the hamiltonian (dh, ...) when passed have to have units Å . eV units and dependency of a k adimensional, as H(k).
+# which typically for dh, dhh and alike magnitudes to be multiplied by a0, a0^2, although they depend on an adimensional k.
+# the integral does have a prefactor a0^d coming from the dk^d
+
 module Optics_in_the_length_gauge
     using Arpack
     using LinearAlgebra

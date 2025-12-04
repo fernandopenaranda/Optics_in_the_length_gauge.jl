@@ -14,18 +14,18 @@
     details on the Hamiltonian (the chemical potential and dielectric field...) are set in the parameters of the Hamiltonian stored in `planar_σijk_presets`
 """
 linear_magneto_conductivity(params::Planar_σijk_presets) =
-    linear_magneto_conductivity(
+    linear_magneto_conductivity(params.a0, 
         params.dirJ, params.dirE, params.dirB, params.h, params.nabla_h, 
         params.nabla_nabla_h, params.rz, params.τ, params.T,
         params.berry_contribution, params.omm_contribution, params.fermi_surface, params.with_shift,
         params.computation.xbounds, params.computation.ybounds, params.computation.evals)
 
-function linear_magneto_conductivity(i,j,k, h, dh, ddh, rz, τ, T, Ω_contr, omm_contr, #N
+function linear_magneto_conductivity(a0, i,j,k, h, dh, ddh, rz, τ, T, Ω_contr, omm_contr, #N
     fermi_surface, with_shift, xbounds, ybounds, evals; rel_tol = 1e-5, abs_tol = 0)
     integrand(q) = k_linear_magneto_conductivity(i, j, k, h, dh, ddh, rz, q; T = T, τ = τ, 
         Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface, with_shift = with_shift) 
     val = bz_integration_transport(integrand, xbounds, ybounds, evals, rel_tol = rel_tol, abs_tol = abs_tol)
-    bz_vol = (1/(2pi*ang_to_m))^(length(xbounds))                                                              
+    bz_vol = (1/(2pi*a0*ang_to_m))^(length(xbounds))                                                              
     return bz_vol * val
 end
 

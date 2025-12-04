@@ -25,12 +25,12 @@ function k_σij_anomalous_hall(i,j,h,dh, T)
     ϵs, ψs = eigen(Matrix(h))     
     ri = r(ϵs, ψs, dh[which_ind(i)]) .* ang_to_m
     rj = r(ϵs, ψs, dh[which_ind(j)]) .* ang_to_m
-    return f(ϵs, 0, T) .* Ωz(i, ri, rj)
+    return sum(f(ϵs, 0, T) .* Ωz(i, ri, rj))
 end
 """
     Ωz
 computes the out-of-plane component of the Berry curvature given by
 """
-Ωz(i, ri, rj) = 2ϵ(i) * imag(Σ_nondiag(ri, rj))
+Ωz(i, ri, rj) = 2ε(i) * imag(Σ_nondiag(ri, rj))
 
 which_ind(i::Symbol) = i == :x ? 1 : 2

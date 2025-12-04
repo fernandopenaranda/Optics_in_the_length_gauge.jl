@@ -169,3 +169,15 @@ function return_kwargs(kws, name::Symbol)
     else  nothing
     end
 end
+
+
+#_________________________________________________________________________________________
+# Extra
+#_________________________________________________________________________________________
+"""warn functions"""
+function warn_equalargs(a, b)
+    if a == b
+        @warn "Arguments are equal; stopping."
+        error("Arguments must not be equal.")
+    end
+end

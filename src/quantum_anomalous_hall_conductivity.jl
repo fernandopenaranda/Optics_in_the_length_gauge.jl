@@ -1,7 +1,7 @@
 
 """
 computes the σ_ij in the presence in a system finite in systems with an intrinsic Ωz ≠ 0
-with i, j in the plane (x,y)
+with i, j in the plane (x,y) in units of e^2/h
 σ^A_ij = ϵ_ij 2π e^2/h ∑n ∫ dk^2/(2π)^d Ωz,n(k) f_n(k)
 where f is the occupation function (temperature dependent),
 and ϵ_ij = {1 if i = x, j = y, -1if i = y, j = x, 0 otherwise }
@@ -13,12 +13,12 @@ and ϵ_ij = {1 if i = x, j = y, -1if i = y, j = x, 0 otherwise }
 
 
 function σij_anomalous_hall(a0, i, j, h, dh, T, cpt; rel_tol = 1e-5, abs_tol = 0) 
-    # Add a warning if i == j.
+    warn_equalargs(i, j)
     integrand(q) = k_σij_anomalous_hall(i, j, h(q), dh(q), T)
     bz_vol = 1/(2pi*a0*ang_to_m)^length(cpt.xbounds)
     val = bz_integration_transport(integrand, cpt, 
         rel_tol = rel_tol, abs_tol = abs_tol)
-    return bz_vol * val
+    return 2π * bz_vol * val # in units of e^2/h
 end
 
 function k_σij_anomalous_hall(i,j,h,dh, T)

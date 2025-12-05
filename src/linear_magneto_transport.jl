@@ -37,20 +37,20 @@ function linear_magneto_conductivity(a0, i,j,k, h, dh, ddh, rz, τ, T, Ω_contr,
         fs_vxvx(q) = vivj_shift(h, dh, q, T)
         val_dos = bz_vol * integrator(densityofstates)
         val_qah = bz_vol * integrator(pseudo_qah)
-        val_fs_vxx = bz_vol * integrator(fs_vxvx)
+        val_fs_vxvx = bz_vol * integrator(fs_vxvx)
         discardnan(x) = isnan(x) ? 0 : x
-        return 0*val + discardnan(val_fs_vxx) 
-
-        # return val + discardnan(τ/val_dos * val_fs_vxx * val_qah ) #note that val is multiplied also by τ
+        return 0*val + discardnan(τ/val_dos * val_fs_vxx * val_qah ) #note that val is multiplied also by τ
     end
 end 
 """"
 correction due to switching into the canonical ensemble
+dependency on the second derivative results in a very small weight at low temperature.
+therefore we neglet this term and the one proportional to the OMM see Eq. in our supplementary
 """
 function vivj_shift(h, dh, q, T)
     ϵs, ψs = eigen(Matrix(h(q)))
     vx = vel(ψs, dh(q)[1]) * ang_to_m/ ħ_ev_s
-    return sum(d_d_f(ϵs, 0, T) .* real(diag(vx)) .^ 2)
+    return sum(d_d_f(ϵs, 0, T) .* real(diag(vx)) .^ 2) # dependency on the second derivative results in a very small weight
 end
 
 
@@ -95,6 +95,14 @@ end
 correction due to switching into the canonical ensemble
 """
 mr_vij(i, vj,rz, vij) = real(OMM(i, vj, rz) .* diag(vij))
+
+function k_Ωi_fs(i, j, h, dh, rz, q, T)
+    ϵs, ψs = eigen(Matrix(h(q)))
+    rzmat = rz(q, ψs) .* ang_to_m     
+    rj = r(ϵs, ψs, dh(q)[which_ind(j)]) .* ang_to_m
+    # return sum([fn(ϵ, 0, T) for ϵ in ϵs])
+    return sum( Ωin(i, rj, rzmat))
+end
 
 
 # """shift correction due to the magnetic field effect on the bandstructure"""
@@ -147,13 +155,6 @@ function mr_Ω(i, j, k, rz, rx, ry, vx, vy)
     return real((diag(vi) .* diag(vj) .* Ωin(k, r_not_k, rz) .- 
             (δ_kron(j,k) .* diag(vi) .+ δ_kron(i,k) .* diag(vj)) .* 
             (diag(vx) .* Ωin(:x, ry, rz) .+ diag(vy) .* Ωin(:y, rx, rz)))) # this is real diag(vx) is in R
-end
-
-function k_Ωi_fs(i, j, h, dh, rz, q, T)
-    ϵs, ψs = eigen(Matrix(h(q)))
-    rzmat = rz(q, ψs) .* ang_to_m     
-    rj = r(ϵs, ψs, dh(q)[which_ind(j)]) .* ang_to_m
-    return sum(f(ϵs, 0, T) .* Ωin(i, rj, rzmat))
 end
 
 function mr_corr() #not sure if it vanishes due to vij. Lets not include it for now

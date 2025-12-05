@@ -106,7 +106,7 @@ end
 # FERMI FUNCTION AND ITS DERIVATIVES
 #_________________________________________________________________________________________
 
-f(ϵs, μ, T) = [fn(ϵs[i], μ, T) - fn(ϵs[j], μ, T) for i in 1:length(ϵs), j in 1:length(ϵs)]
+f(ϵs, μ, T) = [fn(ϵs[i], μ, T) - fn(ϵs[j], μ, T) for i in 1:length(ϵs), j in 1:length(ϵs)] #nothe this is a matrix difference of fermi functions
 fn(ϵn,μ::Float64) = ifelse(ϵn < μ, 1.0, 0.0)
 function fn(ϵn, μ, T)
     if T == 0

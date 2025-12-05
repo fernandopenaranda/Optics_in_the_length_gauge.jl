@@ -40,7 +40,7 @@ function linear_magneto_conductivity(a0, i,j,k, h, dh, ddh, rz, τ, T, Ω_contr,
         val_qah = bz_vol * integrator(pseudo_qah)
         val_fs_vxx = bz_vol * integrator(fs_vxx)
         discardnan(x) = isnan(x) ? 1 : x
-        return 0*val + τ/discardnan(val_dos) * val_fs_vxx * val_qah  #note that val is multiplied also by τ
+        return 0*val + discardnan(τ/val_dos * val_fs_vxx * val_qah ) #note that val is multiplied also by τ
     end
 end 
 # tenemos un problema, \Omega tiene que estar en el plano porque viene del producto escalar con B

@@ -100,8 +100,7 @@ function k_Ωi_fs(i, j, h, dh, rz, q, T)
     ϵs, ψs = eigen(Matrix(h(q)))
     rzmat = rz(q, ψs) .* ang_to_m     
     rj = r(ϵs, ψs, dh(q)[which_ind(j)]) .* ang_to_m
-    # return sum([fn(ϵ, 0, T) for ϵ in ϵs])
-    return sum( Ωin(i, rj, rzmat))
+    return sum([fn(ϵ, 0, T) for ϵ in ϵs] .* Ωin(i, rj, rzmat))
 end
 
 

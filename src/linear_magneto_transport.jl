@@ -32,7 +32,6 @@ function linear_magneto_conductivity(a0, i,j,k, h, dh, ddh, rz, τ, T, Ω_contr,
     if with_shift == false                                                              
         return val
     else 
-    
         densityofstates(q) = alt_dos(h, q, T)
         pseudo_qah(q) = k_Ωi_fs(i, j, h, dh, rz, q, T) # it is pseudo because Ω is in the plane
         fs_vxx(q) = vij_shift(h, ddh, q, T)
@@ -40,8 +39,8 @@ function linear_magneto_conductivity(a0, i,j,k, h, dh, ddh, rz, τ, T, Ω_contr,
         val_dos = bz_vol * integrator(densityofstates)
         val_qah = bz_vol * integrator(pseudo_qah)
         val_fs_vxx = bz_vol * integrator(fs_vxx)
-        discardnan(x) = isnan(x) ? 0 : x
-        return val + discardnan(τ/val_dos * val_fs_vxx * val_qah)  #note that val is multiplied also by τ
+        discardnan(x) = isnan(x) ? 1 : x
+        return val + τ/discardnan(val_dos) * val_fs_vxx * val_qah  #note that val is multiplied also by τ
     end
 end 
 # tenemos un problema, \Omega tiene que estar en el plano porque viene del producto escalar con B
@@ -80,19 +79,9 @@ function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T;
     end
 end
 
-
-# """shift correction due to the magnetic field effect on the bandstructure"""
-# function k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T; fermi_surface = false)
-#     ry = r(ϵs, ψs, dhy) * ang_to_m
-#     rzmat *= ang_to_m
-#     vxx = vel(ψs, dhxx) * ang_to_m^2/ ħ_ev_s
-#     vy = vel(ψs, dhy) * ang_to_m/ ħ_ev_s
-#     if fermi_surface == true
-#         return sum(d_f(ϵs, 0, T))
-#     else
-#         # δμ_shift(i, ϵs, T, vy, ry, rzmat) * vij_shift(ϵs, T, vxx)/sum(d_f(ϵs, 0, T))
-#     end
-# end
+#_________________________________________________________________________________________
+#   CANONICAL ENSEMBLE CORRECTIONS
+#_________________________________________________________________________________________
 """"
 correction due to switching into the canonical ensemble
 """
@@ -107,17 +96,31 @@ correction due to switching into the canonical ensemble
 """
 mr_vij(i, vj,rz, vij) = real(OMM(i, vj, rz) .* diag(vij))
 
-function δμ_shift(i, ϵs, T, vj, rj, rz; Ω_contr = true, omm_contr = true) 
-    Ω_switch = ifelse(Ω_contr == true, 1, 0)
-    omm_switch = ifelse(omm_contr == true, 1, 0)
-    return sum(d_f(ϵs, 0, T) .* (omm_switch .* OMM(i, vj, rz)) + 
-    (Ω_switch .* Ωin(i, rj, rz)) .* f(ϵs, 0, T)/ħ_ev_s) #units 1/e m^2
-end
 
-# ----------------------------------------------------------------------------------------
+# """shift correction due to the magnetic field effect on the bandstructure"""
+# function k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T; fermi_surface = false)
+#     ry = r(ϵs, ψs, dhy) * ang_to_m
+#     rzmat *= ang_to_m
+#     vxx = vel(ψs, dhxx) * ang_to_m^2/ ħ_ev_s
+#     vy = vel(ψs, dhy) * ang_to_m/ ħ_ev_s
+#     if fermi_surface == true
+#         return sum(d_f(ϵs, 0, T))
+#     else
+#         # δμ_shift(i, ϵs, T, vy, ry, rzmat) * vij_shift(ϵs, T, vxx)/sum(d_f(ϵs, 0, T))
+#     end
+# end
+
+# function δμ_shift(i, ϵs, T, vj, rj, rz; Ω_contr = true, omm_contr = true) 
+#     Ω_switch = ifelse(Ω_contr == true, 1, 0)
+#     omm_switch = ifelse(omm_contr == true, 1, 0)
+#     return sum(d_f(ϵs, 0, T) .* (omm_switch .* OMM(i, vj, rz)) + 
+#     (Ω_switch .* Ωin(i, rj, rz)) .* f(ϵs, 0, T)/ħ_ev_s) #units 1/e m^2
+# end
+
+#_________________________________________________________________________________________
 #           Magnetorresistance integrand terms: m_Ω, m_OMM, and n-fixing correction
 #                          before convoluting with Fermi derivatives                              
-# ----------------------------------------------------------------------------------------
+#_________________________________________________________________________________________
 """
 Orbital magnetic moment contribution to the 
 linear magnetorresistance (planar case)                          UNITS:  e

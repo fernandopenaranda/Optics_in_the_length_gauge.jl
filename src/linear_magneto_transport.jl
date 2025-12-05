@@ -34,11 +34,11 @@ function linear_magneto_conductivity(a0, i,j,k, h, dh, ddh, rz, τ, T, Ω_contr,
     else 
         densityofstates(q) = alt_dos(h, q, T)
         pseudo_qah(q) = k_Ωi_fs(i, j, h, dh, rz, q, T) # it is pseudo because Ω is in the plane
-        fs_vxx(q) = vij_shift(h, ddh, q, T)
-
+        fs_vxvx(q) = vivj_shift(h, dh[1], q, T)
+  
         val_dos = bz_vol * integrator(densityofstates)
         val_qah = bz_vol * integrator(pseudo_qah)
-        val_fs_vxx = bz_vol * integrator(fs_vxx)
+        val_fs_vxx = bz_vol * integrator(fs_vxvx)
         discardnan(x) = isnan(x) ? 1 : x
         return 0*val + discardnan(τ/val_dos * val_fs_vxx * val_qah ) #note that val is multiplied also by τ
     end
@@ -85,12 +85,11 @@ end
 """"
 correction due to switching into the canonical ensemble
 """
-function vij_shift(h, dhxx, q, T)
+function vivj_shift(h, dhx, q, T)
     ϵs, ψs = eigen(Matrix(h(q)))
-    vxx = vel(ψs, dhxx(q)) * ang_to_m^2/ ħ_ev_s
-    return vij_shift(ϵs, T, vxx)
+    vx = vel(ψs, dhx(q)) * ang_to_m/ ħ_ev_s
+    return sum(d_d_f(ϵs, 0, T) .* real(diag(vx))^2)
 end
-vij_shift(ϵs, T, vij) = sum(d_f(ϵs, 0, T) .* real(diag(vij))) #check this, maybe here we have a sum
 """"
 correction due to switching into the canonical ensemble
 """

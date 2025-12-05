@@ -108,7 +108,6 @@ end
 
 f(ϵs, μ, T) = [fn(ϵs[i], μ, T) - fn(ϵs[j], μ, T) for i in 1:length(ϵs), j in 1:length(ϵs)]
 fn(ϵn,μ::Float64) = ifelse(ϵn < μ, 1.0, 0.0)
-
 function fn(ϵn, μ, T)
     if T == 0
         return ifelse(ϵn < μ, 1.0, 0.0)
@@ -116,11 +115,13 @@ function fn(ϵn, μ, T)
         return 1/(exp((ϵn - μ)/(kB * T)) + 1)
     end
 end
-d_fn(ϵn, μ, T) = -1/(kB*T) * fn(ϵn, μ, T) * (1-fn(ϵn, μ, T)) 
+# first derivative with respect to E
 d_f(ϵs, μ, T) = [d_fn(ϵn, μ, T) for ϵn in ϵs]
-
-
-    
+d_fn(ϵn, μ, T) = -1/(kB*T) * fn(ϵn, μ, T) * (1-fn(ϵn, μ, T)) 
+# second derivative with respect to E
+d_d_f(ϵs, μ, T) = [d_d_fn(ϵn, μ, T) for ϵn in ϵs]
+d_d_fn(ϵn, μ, T) = - 1/(kB*T)^2 * d_d_fn((ϵn-μ)/(kB*T))
+d_d_fn(x) = e^x * (e^x-1)/(e^x+1)^3
 #-------------------------------------------------------------------------------------------
 # Aux operations
 #-------------------------------------------------------------------------------------------

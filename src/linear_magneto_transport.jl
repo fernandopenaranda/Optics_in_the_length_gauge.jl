@@ -34,16 +34,23 @@ function linear_magneto_conductivity(a0, i,j,k, h, dh, ddh, rz, τ, T, Ω_contr,
     else 
         densityofstates(q) = alt_dos(h, q, T)
         pseudo_qah(q) = k_Ωi_fs(i, j, h, dh, rz, q, T) # it is pseudo because Ω is in the plane
-        fs_vxvx(q) = vivj_shift(h, dh[1], q, T)
-  
+        fs_vxvx(q) = vivj_shift(h, dh, q, T)
         val_dos = bz_vol * integrator(densityofstates)
         val_qah = bz_vol * integrator(pseudo_qah)
         val_fs_vxx = bz_vol * integrator(fs_vxvx)
-        discardnan(x) = isnan(x) ? 1 : x
+        discardnan(x) = isnan(x) ? 0 : x
         return 0*val + discardnan(τ/val_dos * val_fs_vxx * val_qah ) #note that val is multiplied also by τ
     end
 end 
-# tenemos un problema, \Omega tiene que estar en el plano porque viene del producto escalar con B
+""""
+correction due to switching into the canonical ensemble
+"""
+function vivj_shift(h, dh, q, T)
+    ϵs, ψs = eigen(Matrix(h(q)))
+    vx = vel(ψs, dh(q)[1]) * ang_to_m/ ħ_ev_s
+    return sum(d_d_f(ϵs, 0, T) .* real(diag(vx)) .^ 2)
+end
+
 
 function k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, ddhi, rz::Function, q; 
     T = 2, τ = 1e-15, Ω_contr = true, omm_contr = true, fermi_surface = false, with_shift = true)
@@ -82,14 +89,6 @@ end
 #_________________________________________________________________________________________
 #   CANONICAL ENSEMBLE CORRECTIONS
 #_________________________________________________________________________________________
-""""
-correction due to switching into the canonical ensemble
-"""
-function vivj_shift(h, dhx, q, T)
-    ϵs, ψs = eigen(Matrix(h(q)))
-    vx = vel(ψs, dhx(q)) * ang_to_m/ ħ_ev_s
-    return sum(d_d_f(ϵs, 0, T) .* real(diag(vx))^2)
-end
 """"
 correction due to switching into the canonical ensemble
 """

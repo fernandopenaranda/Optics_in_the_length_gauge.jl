@@ -39,7 +39,7 @@ function linear_magneto_conductivity(a0, i,j,k, h, dh, ddh, rz, τ, T, Ω_contr,
         val_qah = bz_vol * integrator(pseudo_qah)
         val_fs_vxvx = bz_vol * integrator(fs_vxvx)
         discardnan(x) = isnan(x) ? 0 : x
-        return 0*val + discardnan(τ/val_dos * val_fs_vxx * val_qah ) #note that val is multiplied also by τ
+        return val + discardnan(τ/val_dos * val_fs_vxvx * val_qah) #note that val is multiplied also by τ
     end
 end 
 """"

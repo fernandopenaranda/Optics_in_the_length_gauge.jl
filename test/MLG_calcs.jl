@@ -35,7 +35,7 @@ end
     #transport tests
     drude_xx_presets = Drude_presets(a0, :x,:x,h,dhx,10,200e-15,cpt)
     ahe_xy_presets = AH_presets(a0, :x, :y, h, nabla_h, 2, cpt)
-    planar_σijk_presets = Planar_σijk_presets(a0, :x,:x,:x, h,nabla_h, dhxx, rz_mat, 200e-15, 10, cpt, true, true, false, false)
+    planar_σijk_presets = Planar_σijk_presets(a0, :x,:x,:x, h,nabla_h, dhxx, rz_mat, 200e-15, 10, cpt, true, true, false, true)
     @test does_not_throw(dos, dos_presets)
     @test does_not_throw(jdos, jdos_presets)
     @test does_not_throw(linear_optical_conductivity, sigma_ij_presets)

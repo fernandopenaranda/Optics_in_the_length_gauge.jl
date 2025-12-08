@@ -111,6 +111,7 @@ end
 
 function k_d_OMM_fs(i, j, h, dh, rz, q, T)
     ϵs, ψs = eigen(Matrix(h(q)))
+    omega = Ω(ϵs)
     dhx = dh(q)[1]
     dhy = dh(q)[2]
     Δx = Δ(ψs, dhx) * ang_to_m

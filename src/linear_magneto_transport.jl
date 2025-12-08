@@ -87,15 +87,6 @@ function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T;
     end
 end
 
-function k_Ωin(i::Symbol, j::Symbol, k::Symbol, h, dh, rz::Function, q)
-    err_knotin(k)
-    ϵs, ψs = eigen(Matrix(h(q)))
-    rx = r(ϵs, ψs, dh(q)[1]) * ang_to_m
-    ry = r(ϵs, ψs, dh(q)[2]) * ang_to_m
-    r_not_k = which_mat(k, ry, rx)
-    return Ωin(i, r_not_k, rz(q, ψs))
-end
-
 #_________________________________________________________________________________________
 #   CANONICAL ENSEMBLE CORRECTIONS
 #_________________________________________________________________________________________
@@ -109,7 +100,7 @@ function k_Ωi_fs(i, j, h, dh, rz, q, T)
     rzmat = rz(q, ψs) .* ang_to_m     
     rj = r(ϵs, ψs, dh(q)[which_ind(j)]) .* ang_to_m
     
-    return sum([fn(ϵ, 0, T) for ϵ in ϵs] .* Ωin(i, rj, rzmat))
+    return sum(d_f(ϵs, 0, T) .* Ωin(i, rj, rzmat))
 end
 # """shift correction due to the magnetic field effect on the bandstructure"""
 # function k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T; fermi_surface = false)

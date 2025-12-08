@@ -109,7 +109,7 @@ function k_Ωz_fs(i, j, h, dh, rz, q, T)
     return sum(d_f(ϵs, 0, T) .* Ωin(i, rj, rzmat))
 end
 
-function k_OMM_fs(i, j, h, dh, rz, q, T)
+function k_d_OMM_fs(i, j, h, dh, rz, q, T)
     ϵs, ψs = eigen(Matrix(h(q)))
     dhx = dh(q)[1]
     dhy = dh(q)[2]

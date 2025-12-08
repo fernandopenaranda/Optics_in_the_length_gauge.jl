@@ -93,7 +93,7 @@ function k_Ωin(i::Symbol, j::Symbol, k::Symbol, h, dh, rz::Function, q)
     rx = r(ϵs, ψs, dh(q)[1]) * ang_to_m
     ry = r(ϵs, ψs, dh(q)[2]) * ang_to_m
     r_not_k = which_mat(k, ry, rx)
-    return Ωin(i, r_not_k, rz)
+    return Ωin(i, r_not_k, rz(q))
 end
 
 #_________________________________________________________________________________________

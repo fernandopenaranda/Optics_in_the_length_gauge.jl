@@ -88,7 +88,7 @@ function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T;
 end
 
 #_________________________________________________________________________________________
-#   CANONICAL ENSEMBLE CORRECTIONS
+#   CANONICAL ENSEMBLE CORRECTIONS. All of these are fermi surface properties
 #_________________________________________________________________________________________
 """"
 correction due to switching into the canonical ensemble
@@ -99,9 +99,27 @@ function k_Ωi_fs(i, j, h, dh, rz, q, T)
     ϵs, ψs = eigen(Matrix(h(q)))
     rzmat = rz(q, ψs) .* ang_to_m     
     rj = r(ϵs, ψs, dh(q)[which_ind(j)]) .* ang_to_m
-    
     return sum(d_f(ϵs, 0, T) .* Ωin(i, rj, rzmat))
 end
+
+function k_Ωz_fs(i, j, h, dh, rz, q, T)
+    ϵs, ψs = eigen(Matrix(h(q)))
+    rzmat = rz(q, ψs) .* ang_to_m     
+    rj = r(ϵs, ψs, dh(q)[which_ind(j)]) .* ang_to_m
+    return sum(d_f(ϵs, 0, T) .* Ωin(i, rj, rzmat))
+end
+
+function k_OMM_fs(i, j, h, dh, rz, q, T)
+    ϵs, ψs = eigen(Matrix(h(q)))
+    dhx = dh(q)[1]
+    dhy = dh(q)[2]
+    Δx = Δ(ψs, dhx) * ang_to_m
+    Δy = Δ(ψs, dhy) * ang_to_m
+    rx = r(ϵs, ψs, dh(q)[1]) * ang_to_m
+    ry = r(ϵs, ψs, dhy(q)[2]) * ang_to_m
+    return sum(d_f(ϵs, 0, T) .* d_OMM(j, i, omega, rx, ry, Δx, Δy, rz(q, Ψs)))
+end
+
 # """shift correction due to the magnetic field effect on the bandstructure"""
 # function k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T; fermi_surface = false)
 #     ry = r(ϵs, ψs, dhy) * ang_to_m

@@ -115,8 +115,8 @@ function k_d_OMM_fs(i, j, h, dh, rz, q, T)
     dhy = dh(q)[2]
     Δx = Δ(ψs, dhx) * ang_to_m
     Δy = Δ(ψs, dhy) * ang_to_m
-    rx = r(ϵs, ψs, dh(q)[1]) * ang_to_m
-    ry = r(ϵs, ψs, dhy(q)[2]) * ang_to_m
+    rx = r(ϵs, ψs, dhx) * ang_to_m
+    ry = r(ϵs, ψs, dhy) * ang_to_m
     return sum(d_f(ϵs, 0, T) .* d_OMM(j, i, omega, rx, ry, Δx, Δy, rz(q, Ψs)))
 end
 

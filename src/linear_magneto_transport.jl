@@ -118,7 +118,7 @@ function k_d_OMM_fs(i, j, h, dh, rz, q, T)
     Δy = Δ(ψs, dhy) * ang_to_m
     rx = r(ϵs, ψs, dhx) * ang_to_m
     ry = r(ϵs, ψs, dhy) * ang_to_m
-    return sum(d_f(ϵs, 0, T) .* d_OMM(j, i, omega, rx, ry, Δx, Δy, rz(q, Ψs)))
+    return sum(d_f(ϵs, 0, T) .* d_OMM(j, i, omega, rx, ry, Δx, Δy, rz(q, ψs)))
 end
 
 # """shift correction due to the magnetic field effect on the bandstructure"""

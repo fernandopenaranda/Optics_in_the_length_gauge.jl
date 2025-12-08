@@ -53,7 +53,6 @@ function vivj_shift(h, dh, q, T)
     return sum(d_d_f(ϵs, 0, T) .* real(diag(vx)) .^ 2) # dependency on the second derivative results in a very small weight
 end
 
-
 function k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, ddhi, rz::Function, q; 
     T = 2, τ = 1e-15, Ω_contr = true, omm_contr = true, fermi_surface = false, with_shift = true)
     ϵs, ψs = eigen(Matrix(h(q)))                                                                          
@@ -88,6 +87,15 @@ function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T;
     end
 end
 
+function k_Ωin(i::Symbol, j::Symbol, k::Symbol, h, dh, rz::Function, q)
+    err_knotin(k)
+    ϵs, ψs = eigen(Matrix(h(q)))
+    rx = r(ϵs, ψs, dh(q)[1]) * ang_to_m
+    ry = r(ϵs, ψs, dh(q)[2]) * ang_to_m
+    r_not_k = which_mat(k, ry, rx)
+    return Ωin(i, r_not_k, rz)
+end
+
 #_________________________________________________________________________________________
 #   CANONICAL ENSEMBLE CORRECTIONS
 #_________________________________________________________________________________________
@@ -100,10 +108,9 @@ function k_Ωi_fs(i, j, h, dh, rz, q, T)
     ϵs, ψs = eigen(Matrix(h(q)))
     rzmat = rz(q, ψs) .* ang_to_m     
     rj = r(ϵs, ψs, dh(q)[which_ind(j)]) .* ang_to_m
+    
     return sum([fn(ϵ, 0, T) for ϵ in ϵs] .* Ωin(i, rj, rzmat))
 end
-
-
 # """shift correction due to the magnetic field effect on the bandstructure"""
 # function k_linear_mr_integrand_shift(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T; fermi_surface = false)
 #     ry = r(ϵs, ψs, dhy) * ang_to_m

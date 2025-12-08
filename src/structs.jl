@@ -36,7 +36,6 @@ end
     computation::Union{Optical_computation_presets, Transport_computation_presets}
 end
 
-
 # TRANSPORT 
 
 @with_kw struct Drude_presets

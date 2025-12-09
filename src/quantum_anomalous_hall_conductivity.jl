@@ -5,11 +5,11 @@ with i, j in the plane (x,y) in units of e^2/h
 σ^A_ij = ϵ_ij 2π e^2/h ∑n ∫ dk^2/(2π)^d Ωz,n(k) f_n(k)
 where f is the occupation function (temperature dependent),
 and ϵ_ij = {1 if i = x, j = y, -1if i = y, j = x, 0 otherwise }
-
+There are two methods written for practical convenience.
 """
 σij_anomalous_hall(params::Planar_σijk_presets) = 
     σij_anomalous_hall(params.a0, params.dirJ, params.dirE,
-    params.h, params.dh, params.T, params.computation)
+    params.h, params.nabla_h, params.T, params.computation)
 
 
 σij_anomalous_hall(params::AH_presets) = 

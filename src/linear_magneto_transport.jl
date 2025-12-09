@@ -103,10 +103,10 @@ function k_Ωi_fs(i, j, h, dh, rz, q, T)
 end
 
 function k_Ωz_fs(i, j, h, dh, rz, q, T)
-    ϵs, ψs = eigen(Matrix(h(q)))
-    rzmat = rz(q, ψs) .* ang_to_m     
+    ϵs, ψs = eigen(Matrix(h(q)))  
+    ri = r(ϵs, ψs, dh(q)[which_ind(i)]) .* ang_to_m
     rj = r(ϵs, ψs, dh(q)[which_ind(j)]) .* ang_to_m
-    return sum(d_f(ϵs, 0, T) .* Ωin(i, rj, rzmat))
+    return sum(d_f(ϵs, 0, T)  .* Ωz(i, ri, rj))
 end
 
 function k_d_OMM_fs(i, j, h, dh, rz, q, T)

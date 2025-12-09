@@ -30,7 +30,7 @@ function k_σij_anomalous_hall(i,j,h,dh, T)
     ϵs, ψs = eigen(Matrix(h))     
     ri = r(ϵs, ψs, dh[which_ind(i)]) .* ang_to_m
     rj = r(ϵs, ψs, dh[which_ind(j)]) .* ang_to_m
-    return sum([fn(ϵ, 0, T) for ϵ in ϵs] .* Ωz(i, ri, rj))                    #checkcheckcheck Anomalous Hall error.
+    return sum([fn(ϵ, 0, T) for ϵ in ϵs] .* Ωz(i, ri, rj))
 end
 
 """

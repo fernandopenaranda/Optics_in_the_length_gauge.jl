@@ -26,7 +26,6 @@ end
     computation::Union{Optical_computation_presets, Transport_computation_presets}
 end
 
-
 @with_kw struct σij_presets
     a0::Float64
     dirJ::Symbol # i'th direction of σij

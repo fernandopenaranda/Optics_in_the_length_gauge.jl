@@ -1,4 +1,3 @@
-
 """
 computes the σ_ij in the presence in a system finite in systems with an intrinsic Ωz ≠ 0
 with i, j in the plane (x,y) in units of e^2/h
@@ -38,5 +37,4 @@ end
 computes the out-of-plane component of the Berry curvature given by
 """
 Ωz(i, ri, rj) = 2ε(i) * imag(Σ_nondiag(ri, rj))
-
 which_ind(i::Symbol) = i == :x ? 1 : 2

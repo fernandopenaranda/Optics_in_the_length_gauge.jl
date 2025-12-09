@@ -106,7 +106,7 @@ function k_Ωz_fs(i, j, h, dh, rz, q, T)
     ϵs, ψs = eigen(Matrix(h(q)))  
     ri = r(ϵs, ψs, dh(q)[which_ind(i)]) .* ang_to_m
     rj = r(ϵs, ψs, dh(q)[which_ind(j)]) .* ang_to_m
-    return sum(d_f(ϵs, 0, T)  .* Ωz(i, ri, rj))
+    return sum([fn(ϵ, 0, T) for ϵ in ϵs] .* Ωz(i, ri, rj))
 end
 
 function k_d_OMM_fs(i, j, h, dh, rz, q, T)

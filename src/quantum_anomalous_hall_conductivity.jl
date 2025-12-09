@@ -30,8 +30,9 @@ function k_σij_anomalous_hall(i,j,h,dh, T)
     ϵs, ψs = eigen(Matrix(h))     
     ri = r(ϵs, ψs, dh[which_ind(i)]) .* ang_to_m
     rj = r(ϵs, ψs, dh[which_ind(j)]) .* ang_to_m
-    return sum(f(ϵs, 0, T) .* Ωz(i, ri, rj))                    #checkcheckcheck Anomalous Hall error.
+    return sum([fn(ϵ, 0, T) for ϵ in ϵs] .* Ωz(i, ri, rj))                    #checkcheckcheck Anomalous Hall error.
 end
+
 """
     Ωz
 computes the out-of-plane component of the Berry curvature given by

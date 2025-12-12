@@ -25,8 +25,6 @@ dependent no regularization path is included within `Optics_in_the_length_gauge`
 expected_value(h, μ, op, Δx, T; kws...) = expected_value(h, μ, op, Δx, Δx, T; kws...)
 
 function expected_value(h, μ, op, Δx, Δy, T; evals = 100, rel_tol= 1e-5, abs_tol = 0)
-    println(Δx)
-    println(Δy)
     integrand(q) = k_expected_value(h, μ, op, q, T)
     val = bz_integration_transport(integrand, Δx , Δy, evals; rel_tol = rel_tol, abs_tol = abs_tol) 
     return val /((Δx[2]-Δx[1])*(Δy[2]-Δy[1]))
@@ -43,7 +41,7 @@ function k_expected_value(h, μ, op, q, T)
         end
     else 
         s = 0.0 
-        for (i, ϵ) in 1:length(ϵs)
+        for (i, ϵ) in ϵs
             s += ψs[:,i]'* op * ψs[:,i] * fn(real(ϵ), μ, T)
         end
     end

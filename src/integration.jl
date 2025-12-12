@@ -12,6 +12,8 @@ bz_integration_optical(f, p::Optical_computation_presets; kws...) =
     bz_integration_optical(f, p.xbounds, p.ybounds, p.ωlist, p.evals; kws...) 
 
 function bz_integration_optical(f, xbounds, ybounds, ωlist, evals; rel_tol = 1e-5, abs_tol = 0) 
+    println(xbounds)
+    println(ybounds)
     val, _ = Cubature.hcubature(length(ωlist), (x,v) -> v[:] = f(x), 
         [xbounds[1], ybounds[1]], [xbounds[2], ybounds[2]]; reltol = rel_tol, abstol= abs_tol, maxevals=Int(evals));
     return val

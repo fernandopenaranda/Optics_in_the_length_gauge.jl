@@ -10,7 +10,6 @@ dependent no regularization path is included within `Optics_in_the_length_gauge`
 """
 filling(h, μ, Δx, T; kws...) = expected_value(h, μ, 1I, Δx, T; kws...)
 filling(h, μ, Δx, Δy, T; kws...) = expected_value(h, μ, 1I, Δx, Δy, T; kws...)
-
 """
     `expected_value(h, μ, op, Δx, T; kws...)`
 returns the expected value of a given operator (same dims as h)

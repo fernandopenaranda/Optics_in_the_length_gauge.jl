@@ -30,6 +30,7 @@ module Optics_in_the_length_gauge
 
     include("structs.jl")
     include("length_gauge_operators.jl")
+    include("expected_values.jl")
     include("integration.jl")
     include("jdos.jl")
     include("linear_optical_conductivity.jl")
@@ -38,7 +39,7 @@ module Optics_in_the_length_gauge
     include("linear_magneto_transport.jl")
     #...
     export Optical_computation_presets, Transport_computation_presets, DOS_presets, JDOS_presets, σij_presets, Drude_presets, AH_presets, Planar_σijk_presets
-    export dos, jdos, linear_optical_conductivity, drude_conductivity, σij_anomalous_hall, linear_magneto_conductivity
+    export dos, jdos, filling, expected_value, linear_optical_conductivity, drude_conductivity, σij_anomalous_hall, linear_magneto_conductivity
     
     # Export the presets submodule
     export Presets 

@@ -42,8 +42,8 @@ function k_expected_value(h, μ, op, q, T)
         end
     else 
         s = 0.0 
-        for i in 1:lenght(fs)
-            s += ψs[:,i]'* op * ψs[:,i] * fn(real(ϵs[i]), μ, T)
+        for (i, ϵ) in 1:length(ϵs)
+            s += ψs[:,i]'* op * ψs[:,i] * fn(real(ϵ), μ, T)
         end
     end
 

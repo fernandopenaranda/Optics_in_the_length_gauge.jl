@@ -27,7 +27,7 @@ expected_value(h, μ, op, Δx, T; kws...) = expected_value(h, μ, op, Δx, Δx, 
 
 function expected_value(h, μ, op, Δx, Δy, T; evals = 100, rel_tol= 1e-5, abs_tol = 0)
     integrand(q) = k_expected_value(h, μ, op, q, T)
-    val = bz_integration_transport(integrand, [Δx[1],Δy[1]] , [Δx[2],Δy[2]], evals; rel_tol = rel_tol, abs_tol = abs_tol) 
+    val = bz_integration_transport(integrand, Δx , Δy, evals; rel_tol = rel_tol, abs_tol = abs_tol) 
     return val /((Δx[2]-Δx[1])*(Δy[2]-Δy[1]))
 end
 
@@ -35,7 +35,6 @@ function k_expected_value(h, μ, op, q, T)
     check_same_size(h(q), op)
     ϵs, ψs = eigen(h(q))
     if  T == 0
-        mat = ψs[:, findall(ϵ-> ϵ < μ, real(ϵs))]
         inds  = findall(ϵ-> ϵ < μ, real(ϵs))
         s = 0.0 
         for ind in inds

@@ -29,7 +29,8 @@ bz_integration_transport(f, p::Transport_computation_presets; kws...) =
     bz_integration_transport(f, p.xbounds, p.ybounds, p.evals; kws...) 
 
 function bz_integration_transport(f, xbounds, ybounds, evals; rel_tol = 1e-5, abs_tol = 0) 
+    println([xbounds[1], ybounds[1]], [xbounds[2], ybounds[2]])
     val, _ = Cubature.hcubature(f, [xbounds[1], ybounds[1]], [xbounds[2], ybounds[2]];
-        reltol = rel_tol, abstol= abs_tol, maxevals= Int(evals));
+        reltol = rel_tol, abstol= abs_tol, maxevals= Int(round(evals, digits = 0)))
     return val
 end

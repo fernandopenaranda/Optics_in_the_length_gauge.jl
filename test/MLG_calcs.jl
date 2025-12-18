@@ -1,3 +1,4 @@
+using LinearAlgebra
 function does_not_throw(f::Function, args...)
     try
         f(args...)
@@ -36,6 +37,7 @@ end
     drude_xx_presets = Drude_presets(a0, :x,:x,h,dhx,10,200e-15,cpt)
     ahe_xy_presets = AH_presets(a0, :x, :y, h, nabla_h, 2, cpt)
     planar_σijk_presets_orbital = Planar_σijk_presets_orbital(a0, :x,:x,:x, h,nabla_h, dhxx, rz_mat, 200e-15, 10, cpt, true, true, false, true)
+    s_opt = [1I,1I,1I] # this should be sigmax sigmay and sigmaz in the basis of h
     planar_σijk_presets_spin = Planar_σijk_presets_spin([1I,1I,1I], planar_σijk_presets_orbital)
     @test does_not_throw(dos, dos_presets)
     @test does_not_throw(jdos, jdos_presets)

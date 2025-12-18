@@ -41,7 +41,7 @@ module Optics_in_the_length_gauge
     include("linear_magneto_transport_spin.jl")
     #...
     export Optical_computation_presets, Transport_computation_presets, DOS_presets, JDOS_presets, σij_presets, Drude_presets, AH_presets, Planar_σijk_presets_orbital, Planar_σijk_presets_spin
-    export dos, jdos, filling, expected_value, linear_optical_conductivity, drude_conductivity, σij_anomalous_hall, linear_magneto_conductivity_orbital, linear_magneto_conductivity_spin
+    export dos, jdos, filling, expected_value, linear_optical_conductivity, drude_conductivity, σij_anomalous_hall, linear_magneto_conductivity_orbital, linear_magneto_conductivity_spin, linear_magneto_conductivity
     
     # Export the presets submodule
     export Presets 

@@ -77,6 +77,6 @@ end
 end
 
 @with_kw struct Planar_σijk_presets_spin
-    s_op::Array  # array of spin operator [σx, σy, σz] matrix representations
+    s_op::Union{Array, UniformScaling}  # array of spin operator [σx, σy, σz] matrix representations
     p::Planar_σijk_presets_orbital
 end

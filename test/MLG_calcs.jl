@@ -19,7 +19,6 @@ end
         xbounds = [0, 2π/√3],
         ybounds = [-2π, 2π],
         evals = 1e1)
-
     μ = 0
     a0 = 2.46 #in Å
     h(q) = Presets.MLG_hamiltonian(μ, q) # system specific

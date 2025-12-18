@@ -6,7 +6,7 @@ where f is the occupation function (temperature dependent),
 and ϵ_ij = {1 if i = x, j = y, -1if i = y, j = x, 0 otherwise }
 There are two methods written for practical convenience.
 """
-σij_anomalous_hall(params::Planar_σijk_presets) = 
+σij_anomalous_hall(params::Planar_σijk_presets_orbital) = 
     σij_anomalous_hall(params.a0, params.dirJ, params.dirE,
     params.h, params.nabla_h, params.T, params.computation)
 

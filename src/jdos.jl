@@ -35,7 +35,6 @@ function alt_dos(h, q, T)
     return sum(d_f(ϵs, 0, T))
 end
 
-
 """ `jdos(h, xbounds, ybounds, ωlist; kws...)`
 Note that the fermi level is passed on h, thus the functions do not depend on μ.
 Computes the joint density of states, provided a Hamiltonian function with momentum dependence h(\vec k),

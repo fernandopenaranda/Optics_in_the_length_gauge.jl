@@ -1,8 +1,23 @@
+#=
+
+Computation of the linear magneto conductivity in the xxx direction
+two types of contributions coming from the
+    1) Berry curvature
+    2) Magnetic moment
+(2) can also be divided into the orbital contribution to the magnetic moment (2a)
+and the spin contribution (2b): m = OMM + SMM.
+In order to be as general as possible in this package. 1 and 2a are computed together
+and 2b that depends on spin is computed separately asking the user to provide the 
+relevant form of the spin operators in the degrees of freedom of the passed model.
+
+linear_magneto_conductivity_orbital()
+
+=#
 """
     Hamiltonian in eV
     Units: [σxx]/[B]
     returns the symmetric σxxx linear magneto conductivity conductivity
-    `linear_magneto_conductivity(params::planar_σijk_presets)``
+    `linear_magneto_conductivity(params::Planar_σijk_presets_orbital)``
     Input params see structs.jl:
     `dirJ::Symbol`, `dirE::Symbol`, directions of J and E (tensor component of the conductivity)`::Symbols -> {:x, :y}` unbounded 2D directions
     `h::Function` is a Hamiltonian function with dependence on momentum `q`
@@ -11,19 +26,19 @@
     `T::Float64` temperature
     `evals::Int` number of steps in the adaptive integration
     `rz` rz operator(q)
-    details on the Hamiltonian (the chemical potential and dielectric field...) are set in the parameters of the Hamiltonian stored in `planar_σijk_presets`
+    details on the Hamiltonian (the chemical potential and dielectric field...) are set in the parameters of the Hamiltonian stored in `Planar_σijk_presets_orbital`
 """
-linear_magneto_conductivity(params::Planar_σijk_presets) =
-    linear_magneto_conductivity(params.a0, 
+linear_magneto_conductivity_orbital(params::Planar_σijk_presets_orbital) =
+    linear_magneto_conductivity_orbital(params.a0, 
         params.dirJ, params.dirE, params.dirB, params.h, params.nabla_h, 
         params.nabla_nabla_h, params.rz, params.τ, params.T,
         params.berry_contribution, params.omm_contribution, params.fermi_surface, params.with_shift,
         params.computation)
 
-function linear_magneto_conductivity(a0, i,j,k, h, dh, ddh, rz, τ, T, Ω_contr, omm_contr, #N
+function linear_magneto_conductivity_orbital(a0, i,j,k, h, dh, ddh, rz, τ, T, Ω_contr, omm_contr, #N
     fermi_surface, with_shift, cpt; rel_tol = 1e-5, abs_tol = 0)
     
-    integrand(q) = k_linear_magneto_conductivity(i, j, k, h, dh, ddh, rz, q; T = T, τ = τ, 
+    integrand(q) = k_linear_magneto_conductivity_orbital(i, j, k, h, dh, ddh, rz, q; T = T, τ = τ, 
         Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface, with_shift = with_shift) 
     integrator(observable) = bz_integration_transport(observable, cpt, rel_tol = rel_tol, abs_tol = abs_tol)
     bz_vol = 1/(2pi*a0*ang_to_m)^length(cpt.xbounds)
@@ -53,7 +68,7 @@ function vivj_shift(h, dh, q, T)
     return sum(d_d_f(ϵs, 0, T) .* real(diag(vx)) .^ 2) # dependency on the second derivative results in a very small weight
 end
 
-function k_linear_magneto_conductivity(i::Symbol, j::Symbol, k::Symbol, h, dh, ddhi, rz::Function, q; 
+function k_linear_magneto_conductivity_orbital(i::Symbol, j::Symbol, k::Symbol, h, dh, ddhi, rz::Function, q; 
     T = 2, τ = 1e-15, Ω_contr = true, omm_contr = true, fermi_surface = false, with_shift = true)
     ϵs, ψs = eigen(Matrix(h(q)))                                                                          
     C = 2π * τ                                       
@@ -148,7 +163,6 @@ end
 """
 Orbital magnetic moment contribution to the 
 linear magnetorresistance (planar case)                          UNITS:  e
-# .-vijmn * OMM() this is 0 read comment above.
 """
 function mr_omm(i, j, omega, rx, ry, vx, vy, Δx, Δy, rz) 
     vi = which_mat(i, vx, vy)

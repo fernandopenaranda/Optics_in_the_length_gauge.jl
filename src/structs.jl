@@ -58,7 +58,7 @@ end
     computation::Union{Optical_computation_presets, Transport_computation_presets}
 end
 
-@with_kw struct Planar_σijk_presets
+@with_kw struct Planar_σijk_presets_orbital
     a0::Float64
     dirJ::Symbol # i'th direction of σijk
     dirE::Symbol # j'th direction of σijk

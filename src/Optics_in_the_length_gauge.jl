@@ -21,6 +21,7 @@ module Optics_in_the_length_gauge
     using StaticArrays
     using Parameters
     const kB = (PhysicalConstants.CODATA2018.k_B |> u"eV/K").val
+    const μB = (PhysicalConstants.CODATA2018.BohrMagneton |> u"eV/T").val
     const ħ = PhysicalConstants.CODATA2018.ħ
     const e = PhysicalConstants.CODATA2018.e
     const C = ((e^3 / ħ^2) |> u"μA/V^2/s").val
@@ -36,9 +37,10 @@ module Optics_in_the_length_gauge
     include("linear_optical_conductivity.jl")
     include("drude_conductivity.jl")
     include("quantum_anomalous_hall_conductivity.jl")
-    include("linear_magneto_transport.jl")
+    include("linear_magneto_transport_orbital.jl")
+    include("linear_magneto_transport_spin.jl")
     #...
-    export Optical_computation_presets, Transport_computation_presets, DOS_presets, JDOS_presets, σij_presets, Drude_presets, AH_presets, Planar_σijk_presets_orbital
+    export Optical_computation_presets, Transport_computation_presets, DOS_presets, JDOS_presets, σij_presets, Drude_presets, AH_presets, Planar_σijk_presets_orbital, Planar_σijk_presets_spin
     export dos, jdos, filling, expected_value, linear_optical_conductivity, drude_conductivity, σij_anomalous_hall, linear_magneto_conductivity_orbital
     
     # Export the presets submodule

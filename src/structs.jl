@@ -58,7 +58,7 @@ end
     computation::Union{Optical_computation_presets, Transport_computation_presets}
 end
 
-@with_kw struct Planar_σijk_presets_orbital
+@with_kw struct Planar_σijk_presets_orbital # to be generalized to other directions and out of plane then change planar
     a0::Float64
     dirJ::Symbol # i'th direction of σijk
     dirE::Symbol # j'th direction of σijk
@@ -74,4 +74,9 @@ end
     omm_contribution = true # omm contribution to the Planar_σijk
     fermi_surface = false # computes the jdos if true
     with_shift = true # corrects the Planar_σijk with the constant factor that comes from the B field dependency in the bands
+end
+
+@with_kw struct Planar_σijk_presets_spin
+    s_op::Array  # array of spin operator [σx, σy, σz] matrix representations
+    p::Planar_σijk_presets_orbital
 end

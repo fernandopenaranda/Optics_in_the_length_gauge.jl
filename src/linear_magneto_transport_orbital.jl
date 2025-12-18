@@ -16,7 +16,7 @@ linear_magneto_conductivity_orbital()
 """
     Hamiltonian in eV
     Units: [σxx]/[B]
-    returns the symmetric σxxx linear magneto conductivity conductivity
+    returns the berry and OMM contribution symmetric σxxx linear magneto conductivity conductivity
     `linear_magneto_conductivity(params::Planar_σijk_presets_orbital)``
     Input params see structs.jl:
     `dirJ::Symbol`, `dirE::Symbol`, directions of J and E (tensor component of the conductivity)`::Symbols -> {:x, :y}` unbounded 2D directions
@@ -28,6 +28,10 @@ linear_magneto_conductivity_orbital()
     `rz` rz operator(q)
     details on the Hamiltonian (the chemical potential and dielectric field...) are set in the parameters of the Hamiltonian stored in `Planar_σijk_presets_orbital`
 """
+linear_magneto_conductivity(ps::Planar_σijk_presets_spin) =
+        linear_magneto_conductivity_orbital(ps.p) + 
+        linear_magneto_conductivity_spin(ps)
+
 linear_magneto_conductivity_orbital(params::Planar_σijk_presets_orbital) =
     linear_magneto_conductivity_orbital(params.a0, 
         params.dirJ, params.dirE, params.dirB, params.h, params.nabla_h, 

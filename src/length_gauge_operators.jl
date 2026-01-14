@@ -121,7 +121,7 @@ d_f(ϵs, μ, T) = [d_fn(ϵn, μ, T) for ϵn in ϵs]
 function d_fn(ϵn, μ, T)
     # if T === 0
     η = π * kB*T
-    return (-1/π * η) ./ ((μ .- ϵs).^2 .+ η^2) # lorentzian fastest convergency
+    return (-1/π * η) / ((μ - ϵn) ^2 + η^2) # lorentzian fastest convergency
     # else T ≠ 0
         # -1/(kB*T) * fn(ϵn, μ, T) * (1-fn(ϵn, μ, T)) # not used at the moment sech method
     # end

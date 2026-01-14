@@ -117,7 +117,15 @@ function fn(ϵn, μ, T)
 end
 # first derivative with respect to E
 d_f(ϵs, μ, T) = [d_fn(ϵn, μ, T) for ϵn in ϵs]
-d_fn(ϵn, μ, T) = -1/(kB*T) * fn(ϵn, μ, T) * (1-fn(ϵn, μ, T)) 
+
+function d_fn(ϵn, μ, T)
+    # if T === 0
+    η = π * kB*T
+    return (-1/π * η) ./ ((μ .- ϵs).^2 .+ η^2) # lorentzian fastest convergency
+    # else T ≠ 0
+        # -1/(kB*T) * fn(ϵn, μ, T) * (1-fn(ϵn, μ, T)) # not used at the moment sech method
+    # end
+end 
 # second derivative with respect to E
 d_d_f(ϵs, μ, T) = [d_d_fn(ϵn, μ, T) for ϵn in ϵs]
 d_d_fn(ϵn, μ, T) = - 1/(kB*T)^2 * d_d_fn((ϵn-μ)/(kB*T))

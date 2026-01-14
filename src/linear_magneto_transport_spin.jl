@@ -56,4 +56,3 @@ end
 mr_vij_spin(s_op, ψs, vij) = real(SMM(s_op, ψs) .* diag(vij))
 """ spin_magnetic moment """
 SMM(s_op, ψs; g= 2) = - g * μB * ψs' * s_op * ψs
-

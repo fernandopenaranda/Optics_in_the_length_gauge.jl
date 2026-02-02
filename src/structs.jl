@@ -58,22 +58,22 @@ end
     computation::Union{Optical_computation_presets, Transport_computation_presets}
 end
 
-@with_kw struct Planar_σijk_presets_orbital # to be generalized to other directions and out of plane then change planar
+@with_kw struct Planar_σijk_presets_orbital{H} # to be generalized to other directions and out of plane then change planar
     a0::Float64
     dirJ::Symbol # i'th direction of σijk
     dirE::Symbol # j'th direction of σijk
     dirB::Symbol # k'th direction of σijk
-    h::Function # Hamiltonian H(k)
-    nabla_h::Function # ∇_k H(k)
-    nabla_nabla_h::Function #∂^2/∂i^2 H(k) with i = x or y (planar)
-    rz::Function # even thought it is generally independent on q, pass it in the form rz(q, ψ)
+    h::H # Hamiltonian H(k)
+    nabla_h::H # ∇_k H(k)
+    nabla_nabla_h::H #∂^2/∂i^2 H(k) with i = x or y (planar)
+    rz::H # even thought it is generally independent on q, pass it in the form rz(q, ψ)
     τ::Float64 # scattering time
     T::Number # Temperature in K
     computation::Union{Optical_computation_presets, Transport_computation_presets}
-    berry_contribution = true # berry_contribution to the Planar_σijk
-    omm_contribution = true # omm contribution to the Planar_σijk
-    fermi_surface = false # computes the jdos if true
-    with_shift = true # corrects the Planar_σijk with the constant factor that comes from the B field dependency in the bands
+    berry_contribution::Bool # berry_contribution to the Planar_σijk
+    omm_contribution::Bool # omm contribution to the Planar_σijk
+    fermi_surface::Bool # computes the jdos if true
+    with_shift::Bool# corrects the Planar_σijk with the constant factor that comes from the B field dependency in the bands
 end
 
 @with_kw struct Planar_σijk_presets_spin

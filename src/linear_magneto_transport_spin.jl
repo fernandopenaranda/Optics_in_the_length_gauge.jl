@@ -48,9 +48,8 @@ end
 
 "the term with vij is only valid for sigma xxx, generalized if required"
 function k_linear_mr_integrand_spin(s_op, ϵs, ψs, dhxx, T)
-        vxx = vel(ψs, dhxx) * ang_to_m^2/ ħ_ev_s # units meters, eV, seconds
-        return real(sum(d_f(ϵs, 0, T) .* (- mr_vij_spin(s_op, ψs, vxx))))    
-        #only valid in the xx direction
+    vxx = vel(ψs, dhxx) * ang_to_m^2/ ħ_ev_s # units meters, eV, seconds
+    return real(sum(d_f(ϵs, 0, T) .* (- mr_vij_spin(s_op, ψs, vxx))))
 end
 
 mr_vij_spin(s_op, ψs, vij) = real(SMM(s_op, ψs) .* diag(vij))

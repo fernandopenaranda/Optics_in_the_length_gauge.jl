@@ -41,7 +41,6 @@ linear_magneto_conductivity_orbital(params::Planar_σijk_presets_orbital) =
 
 function linear_magneto_conductivity_orbital(a0, i,j,k, h, dh, ddh, rz, τ, T, Ω_contr, omm_contr, #N
     fermi_surface, with_shift, cpt; rel_tol = 1e-5, abs_tol = 0)
-    
     integrand(q) = k_linear_magneto_conductivity_orbital(i, j, k, h, dh, ddh, rz, q; T = T, τ = τ, 
         Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface, with_shift = with_shift) 
     integrator(observable) = bz_integration_transport(observable, cpt, rel_tol = rel_tol, abs_tol = abs_tol)

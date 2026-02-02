@@ -68,7 +68,7 @@ end
     nabla_nabla_h::H #∂^2/∂i^2 H(k) with i = x or y (planar)
     rz::H # even thought it is generally independent on q, pass it in the form rz(q, ψ)
     τ::Float64 # scattering time
-    T::Number # Temperature in K
+    T::Float64 # Temperature in K
     computation::Union{Optical_computation_presets, Transport_computation_presets}
     berry_contribution::Bool # berry_contribution to the Planar_σijk
     omm_contribution::Bool # omm contribution to the Planar_σijk

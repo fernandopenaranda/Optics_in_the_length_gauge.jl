@@ -58,15 +58,15 @@ end
     computation::Union{Optical_computation_presets, Transport_computation_presets}
 end
 
-@with_kw struct Planar_σijk_presets_orbital{H} # to be generalized to other directions and out of plane then change planar
+@with_kw struct Planar_σijk_presets_orbital{H, DH, DHXX, RZ} # to be generalized to other directions and out of plane then change planar
     a0::Float64
     dirJ::Symbol # i'th direction of σijk
     dirE::Symbol # j'th direction of σijk
     dirB::Symbol # k'th direction of σijk
     h::H # Hamiltonian H(k)
-    nabla_h::H # ∇_k H(k)
-    nabla_nabla_h::H #∂^2/∂i^2 H(k) with i = x or y (planar)
-    rz::H # even thought it is generally independent on q, pass it in the form rz(q, ψ)
+    nabla_h::DH # ∇_k H(k)
+    nabla_nabla_h::DDH #∂^2/∂i^2 H(k) with i = x or y (planar)
+    rz::RZ # even thought it is generally independent on q, pass it in the form rz(q, ψ)
     τ::Float64 # scattering time
     T::Float64 # Temperature in K
     computation::Union{Optical_computation_presets, Transport_computation_presets}

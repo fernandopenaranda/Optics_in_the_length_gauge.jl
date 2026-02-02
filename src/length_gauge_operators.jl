@@ -9,28 +9,47 @@ function zop(dim)
     return  3.3/2 .* vcat(ones(dim2), -1 .* ones(dim2))       # 3.3 Å = interlayer distance                                            
 end
 
-function r_covariant(omega, ra, Δa, rb, Δb)                                       # Units: Å^2
-    raa_cov = zeros(ComplexF64, size(ra,1), size(ra,1))#similar(ra)
-    dim = size(omega, 1) 
-    for n in 1:dim
-        for m in 1:dim
-            if m != n && n > m 
-                aux = 0
-                for p in 1:dim
-                    if p != n && p != m
-                        aux += 1im * (omega[n,p]*ra[n,p]*rb[p,m] - 
-                                        omega[p,m]*rb[n,p]*ra[p,m])            # Units: eV * Å * Å 
-                    else
-                        aux += 0
-                    end
+# function r_covariant(omega, ra, Δa, rb, Δb)                                       # Units: Å^2
+#     raa_cov = zeros(ComplexF64, size(ra,1), size(ra,1))#similar(ra)
+#     dim = size(omega, 1) 
+#     for n in 1:dim
+#         for m in 1:dim
+#             if m != n && n > m 
+#                 aux = 0
+#                 for p in 1:dim
+#                     if p != n && p != m
+#                         aux += 1im * (omega[n,p]*ra[n,p]*rb[p,m] - 
+#                                         omega[p,m]*rb[n,p]*ra[p,m])            # Units: eV * Å * Å 
+#                     else
+#                         aux += 0
+#                     end
+#                 end
+#                 raa_cov[n,m] = - ((ra[n,m] * Δb[n,m] + rb[n,m] * Δa[n,m])
+#                                + aux)/omega[n,m]                            # Units: (Å * Å * eV) / eV
+#             else 
+#                 nothing
+#             end
+#         end
+#     end
+#     return raa_cov
+# end
+
+function r_covariant(omega, ra, Δa, rb, Δb)   # Units: Å^2
+    dim = size(omega, 1)
+    raa_cov = zeros(ComplexF64, dim, dim)
+
+    @inbounds for n in 2:dim
+        for m in 1:n-1
+            aux = ComplexF64(0)
+            for p in 1:dim
+                if p != n && p != m
+                    aux += 1im * (omega[n,p]*ra[n,p]*rb[p,m] - omega[p,m]*rb[n,p]*ra[p,m])
                 end
-                raa_cov[n,m] = - ((ra[n,m] * Δb[n,m] + rb[n,m] * Δa[n,m])
-                               + aux)/omega[n,m]                            # Units: (Å * Å * eV) / eV
-            else 
-                nothing
             end
+            raa_cov[n,m] = - ((ra[n,m] * Δb[n,m] + rb[n,m] * Δa[n,m]) + aux) / omega[n,m]
         end
     end
+
     return raa_cov
 end
 

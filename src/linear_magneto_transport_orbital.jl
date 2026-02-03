@@ -71,6 +71,8 @@ function vivj_shift(h, dh, q, T)
     return sum(d_d_f(ϵs, 0, T) .* real(diag(vx)) .^ 2) # dependency on the second derivative results in a very small weight
 end
 
+
+k_linear_magneto_conductivity_orbital
 function k_linear_magneto_conductivity_orbital(i::Symbol, j::Symbol, k::Symbol, h, dh, ddhi, rz::Function, q; 
     T = 2, τ = 1e-15, Ω_contr = true, omm_contr = true, fermi_surface = false, with_shift = true)
     ϵs, ψs = eigen(Matrix(h(q)))                                                                          
@@ -79,6 +81,13 @@ function k_linear_magneto_conductivity_orbital(i::Symbol, j::Symbol, k::Symbol, 
         Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface)           # generalize to σyyy too   
     return σxxx
 end
+
+
+
+
+k_linear_magneto_conductivity_orbital(p::Planar_σijk_presets_orbital) =
+    k_linear_magneto_conductivity_orbital(:x, :x, :x,  p.h, p.nabla_h, p.nabla_nabla_h, p.rz, q; T = p.T, τ = p.τ, 
+    Ω_contr = p.berry_contribution, omm_contr = p.omm_contribution, fermi_surface = p.fermi_surface, with_shift = false)    
 
 "the term with vij is only valid for sigma xxx"
 function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T;

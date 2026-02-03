@@ -112,8 +112,7 @@ function fn(ϵn, μ, T)
     if T == 0
         return ifelse(ϵn < μ, 1.0, 0.0)
     else
-        # return 1/(exp((ϵn - μ)/(kB * T)) + 1) # For RHG
-        return 1/(exp((ϵn - μ)/(1e3*kB * T)) + 1)
+        return 1/(exp((ϵn - μ)/(kB * T)) + 1) # For RHG
 
     end
 end
@@ -122,7 +121,7 @@ d_f(ϵs, μ, T) = [d_fn(ϵn, μ, T) for ϵn in ϵs]
 
 
 function d_fn(ϵn, μ, T)
-        -1/(1e3*kB*T) * fn(ϵn, μ, T) * (1-fn(ϵn, μ, T)) # TBG
+        -1/(kB*T) * fn(ϵn, μ, T) * (1-fn(ϵn, μ, T)) # TBG
 end 
 
 # function d_fn(ϵn, μ, T) # this is for RHG

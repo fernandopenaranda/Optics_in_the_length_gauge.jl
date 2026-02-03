@@ -47,7 +47,6 @@ function linear_magneto_conductivity_orbital(a0, i,j,k, h, dh, ddh, rz, τ, T, �
     integrator(observable) = bz_integration_transport(observable, cpt, rel_tol = rel_tol, abs_tol = abs_tol)
     bz_vol = 1/(2pi*a0*ang_to_m)^length(cpt.xbounds)
     val = bz_vol * integrator(integrand)
-    
     if with_shift == false                                                              
         return val
     else 
@@ -71,7 +70,6 @@ function vivj_shift(h, dh, q, T)
     vx = vel(ψs, dh(q)[1]) * ang_to_m/ ħ_ev_s
     return sum(d_d_f(ϵs, 0, T) .* real(diag(vx)) .^ 2) # dependency on the second derivative results in a very small weight
 end
-
 
 k_linear_magneto_conductivity_orbital(p::Planar_σijk_presets_orbital, q) =
     k_linear_magneto_conductivity_orbital(:x, :x, :x,  p.h, p.nabla_h, p.nabla_nabla_h, p.rz, q; T = p.T, τ = p.τ, 

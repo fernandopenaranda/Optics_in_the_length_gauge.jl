@@ -73,7 +73,7 @@ function vivj_shift(h, dh, q, T)
 end
 
 
-k_linear_magneto_conductivity_orbital(p::Planar_σijk_presets_orbital) =
+k_linear_magneto_conductivity_orbital(p::Planar_σijk_presets_orbital, q) =
     k_linear_magneto_conductivity_orbital(:x, :x, :x,  p.h, p.nabla_h, p.nabla_nabla_h, p.rz, q; T = p.T, τ = p.τ, 
     Ω_contr = p.berry_contribution, omm_contr = p.omm_contribution, fermi_surface = p.fermi_surface, with_shift = false)    
 

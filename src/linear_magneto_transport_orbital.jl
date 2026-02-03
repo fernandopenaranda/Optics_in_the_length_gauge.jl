@@ -39,6 +39,7 @@ linear_magneto_conductivity_orbital(params::Planar_σijk_presets_orbital) =
         params.berry_contribution, params.omm_contribution, params.fermi_surface, params.with_shift,
         params.computation)
 
+
 function linear_magneto_conductivity_orbital(a0, i,j,k, h, dh, ddh, rz, τ, T, Ω_contr, omm_contr, #N
     fermi_surface, with_shift, cpt; rel_tol = 1e-5, abs_tol = 0)
     integrand(q) = k_linear_magneto_conductivity_orbital(i, j, k, h, dh, ddh, rz, q; T = T, τ = τ, 
@@ -72,7 +73,10 @@ function vivj_shift(h, dh, q, T)
 end
 
 
-k_linear_magneto_conductivity_orbital
+k_linear_magneto_conductivity_orbital(p::Planar_σijk_presets_orbital) =
+    k_linear_magneto_conductivity_orbital(:x, :x, :x,  p.h, p.nabla_h, p.nabla_nabla_h, p.rz, q; T = p.T, τ = p.τ, 
+    Ω_contr = p.berry_contribution, omm_contr = p.omm_contribution, fermi_surface = p.fermi_surface, with_shift = false)    
+
 function k_linear_magneto_conductivity_orbital(i::Symbol, j::Symbol, k::Symbol, h, dh, ddhi, rz::Function, q; 
     T = 2, τ = 1e-15, Ω_contr = true, omm_contr = true, fermi_surface = false, with_shift = true)
     ϵs, ψs = eigen(Matrix(h(q)))                                                                          
@@ -81,13 +85,6 @@ function k_linear_magneto_conductivity_orbital(i::Symbol, j::Symbol, k::Symbol, 
         Ω_contr = Ω_contr, omm_contr = omm_contr, fermi_surface = fermi_surface)           # generalize to σyyy too   
     return σxxx
 end
-
-
-
-
-k_linear_magneto_conductivity_orbital(p::Planar_σijk_presets_orbital) =
-    k_linear_magneto_conductivity_orbital(:x, :x, :x,  p.h, p.nabla_h, p.nabla_nabla_h, p.rz, q; T = p.T, τ = p.τ, 
-    Ω_contr = p.berry_contribution, omm_contr = p.omm_contribution, fermi_surface = p.fermi_surface, with_shift = false)    
 
 "the term with vij is only valid for sigma xxx"
 function k_linear_mr_integrand(i, j, k, ϵs, ψs, rzmat, dhx, dhy, dhxx, T;

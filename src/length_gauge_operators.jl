@@ -121,7 +121,9 @@ d_f(ϵs, μ, T) = [d_fn(ϵn, μ, T) for ϵn in ϵs]
 
 
 function d_fn(ϵn, μ, T)
-        -1/(kB*T) * fn(ϵn, μ, T) * (1-fn(ϵn, μ, T)) # TBG
+    η = π * kB*T
+    return (-1/π * η) / ((μ - ϵn) ^2 + η^2) # lorentzian fastest convergency
+        # -1/(kB*T) * fn(ϵn, μ, T) * (1-fn(ϵn, μ, T)) # TBG
 end 
 
 # function d_fn(ϵn, μ, T) # this is for RHG
@@ -196,3 +198,4 @@ function warn_equalargs(a, b)
         error("Arguments must not be equal.")
     end
 end
+

@@ -112,18 +112,17 @@ function fn(ϵn, μ, T)
     if T == 0
         return ifelse(ϵn < μ, 1.0, 0.0)
     else
-        return 1/(exp((ϵn - μ)/(kB * T)) + 1) # For RHG
-
+        return  1/(1+exp((ϵn-μ)/(kB*T)))
     end
 end
 # first derivative with respect to E
 d_f(ϵs, μ, T) = [d_fn(ϵn, μ, T) for ϵn in ϵs]
 
 
-function d_fn(ϵn, μ, T)
+function d_fn(ϵn, μ, T) # this if for tbg
     η = π * kB*T
-    return (-1/π * η) / ((μ - ϵn) ^2 + η^2) # lorentzian fastest convergency
-        # -1/(kB*T) * fn(ϵn, μ, T) * (1-fn(ϵn, μ, T)) # TBG
+    #return #(-1/π * η) / ((μ - ϵn) ^2 + η^2) # lorentzian fastest convergency
+    return -1/(kB*T) * fn(ϵn, μ, T) * (1-fn(ϵn, μ, T)) # TBG
 end 
 
 # function d_fn(ϵn, μ, T) # this is for RHG

@@ -1,6 +1,6 @@
 #=
 
-Computation of the linear magneto conductivity in the xxx direction
+Computation of the linear magneto conductivity σijk^(S,1) along the xxx direction
 two types of contributions coming from the
     1) Berry curvature
     2) Magnetic moment

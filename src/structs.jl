@@ -14,6 +14,13 @@ end
     evals::Number                # Max number of evaluations in adaptive integration
 end
 
+@with_kw struct Transport_computation_3d_presets
+    xbounds::SVector{2, Float64} # Integration limits along k-space x-axis
+    ybounds::SVector{2, Float64} # Integration limits along k-space y-axis
+    zbounds::SVector{2, Float64} # Integration limits along k-space z-axis
+    evals::Number                # Max number of evaluations in adaptive integration
+end
+
 @with_kw struct DOS_presets
     a0::Float64
     h::Function # Hamiltonian H(k)
@@ -74,6 +81,20 @@ end
     omm_contribution::Bool # omm contribution to the Planar_σijk
     fermi_surface::Bool # computes the jdos if true
     with_shift::Bool# corrects the Planar_σijk with the constant factor that comes from the B field dependency in the bands
+end
+
+@with_kw struct Quantum_correction_σijk_antisym{H, DH, DDH} #valid in 3d and 2d if bounded along z
+    a0::Float64
+    dirJ::Symbol # i'th direction of σijk
+    dirE::Symbol # j'th direction of σijk
+    dirB::Symbol # k'th direction of σijk
+    h::H # Hamiltonian H(k)
+    nabla_h::DH # ∇_k H(k)
+    nabla_nabla_h::DDH #∂^2/∂i^2 H(k) with i = x or y (planar)
+    τ::Float64 # scattering time
+    T::Float64 # Temperature in K
+    computation::Union{Optical_computation_presets, Transport_computation_presets}
+    which_mm::Symbol
 end
 
 @with_kw struct Planar_σijk_presets_spin

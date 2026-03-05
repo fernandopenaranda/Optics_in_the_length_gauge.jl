@@ -15,9 +15,8 @@ end
 end
 
 @with_kw struct Transport_computation_3d_presets
-    xbounds::SVector{2, Float64} # Integration limits along k-space x-axis
-    ybounds::SVector{2, Float64} # Integration limits along k-space y-axis
-    zbounds::SVector{2, Float64} # Integration limits along k-space z-axis
+    xbounds::SVector{3, Float64} #lowbounds
+    ybounds::SVector{3, Float64} #topbounds
     evals::Number                # Max number of evaluations in adaptive integration
 end
 

@@ -39,7 +39,7 @@ module Optics_in_the_length_gauge
     include("quantum_anomalous_hall_conductivity.jl")
     include("linear_magneto_transport_orbital.jl")
     include("linear_magneto_transport_spin.jl")
-    include("postional_shift.jl")
+    include("positional_shift.jl")
     #...
     export Optical_computation_presets, Transport_computation_presets, DOS_presets, JDOS_presets, σij_presets, Drude_presets, AH_presets, Planar_σijk_presets_orbital, Planar_σijk_presets_spin, Quantum_correction_σijk_antisym
     export dos, jdos, filling, expected_value, linear_optical_conductivity, drude_conductivity, σij_anomalous_hall, linear_magneto_conductivity_orbital, linear_magneto_conductivity_spin, linear_magneto_conductivity, positional_shift

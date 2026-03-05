@@ -92,7 +92,7 @@ end
     nabla_nabla_h::DDH #∂^2/∂i^2 H(k) with i = x or y (planar)
     τ::Float64 # scattering time
     T::Float64 # Temperature in K
-    computation::Union{Optical_computation_presets, Transport_computation_presets}
+    computation::Union{Optical_computation_presets, Transport_computation_presets, Transport_computation_3d_presets}
     which_mm::Symbol
 end
 

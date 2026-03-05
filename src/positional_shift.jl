@@ -24,10 +24,9 @@ the result is given in units of [1/(TÅ) * e^2/ħ]. T = Tesla
 val * e^2/h * 2pi * e/h 
 """
 quantum_contribution(p::Quantum_correction_σijk_antisym) = 
-quantum_contribution(p.a0, p.dirJ, p.dirE, p.dirB, p.h, p.dh, p.ddh, p.τ, p.T, p.computation, 
-    p.q, p.which_mm)
+quantum_contribution(p.a0, p.dirJ, p.dirE, p.dirB, p.h, p.nabla_h, p.nabla_nabla_h, p.τ, p.T, p.computation, p.which_mm)
 
-function quantum_contribution(a0, dirJ, dirE, dirB, h, dh, ddh, τ, T, cpt, q, which_mm)
+function quantum_contribution(a0, dirJ, dirE, dirB, h, dh, ddh, τ, T, cpt, which_mm)
     checkdims(q)
     checkantisym(a,b,c)
     integrand(q) = integrand_quantum_contribution(dirJ, dirE, dirB, h, dh, ddh, T, q, which_mm = which_mm)

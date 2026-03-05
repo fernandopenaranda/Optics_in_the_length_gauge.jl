@@ -89,7 +89,7 @@ end
     dirB::Symbol # k'th direction of σijk
     h::H # Hamiltonian H(k)
     nabla_h::DH # ∇_k H(k)
-    nabla_nabla_h::DDH #∂^2/∂i^2 H(k) with i = x or y (planar)
+    nabla_nabla_h::DDH 
     τ::Float64 # scattering time
     T::Float64 # Temperature in K
     computation::Union{Optical_computation_presets, Transport_computation_presets, Transport_computation_3d_presets}

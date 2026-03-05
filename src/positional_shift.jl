@@ -44,6 +44,7 @@ function integrand_quantum_contribution(a, b, c, h, dh, ddh, T, q; which_mm = :o
     ddhs = [[ddh(q)[1][1],ddh(q)[1][2],ddh(q)[1][3]], 
             [ddh(q)[2][1],ddh(q)[2][2],ddh(q)[2][3]],
             [ddh(q)[3][1],ddh(q)[3][2],ddh(q)[3][3]]]
+    println("jey")
     integrand_quantum_contribution(a, b, c, ϵs, ψs, dhs, ddhs, T, which_mm = which_mm)
 end
 

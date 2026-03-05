@@ -26,9 +26,9 @@ val * e^2/h * 2pi * e/h
 quantum_contribution(p::Quantum_correction_σijk_antisym) = 
 quantum_contribution(p.a0, p.dirJ, p.dirE, p.dirB, p.h, p.nabla_h, p.nabla_nabla_h, p.τ, p.T, p.computation, p.which_mm)
 
-function quantum_contribution(a0, dirJ, dirE, dirB, h, dh, ddh, τ, T, cpt, which_mm)
+function quantum_contribution(a0, dirJ, dirE, dirB, h, dh, ddh, τ, T, cpt, which_mm, rel_tol = 1e-5, abs_tol = 0)
     checkdims(cpt.xbounds)
-    checkantisym(a,b,c)
+    checkantisym(dirJ,dirE,dirB)
     integrand(q) = integrand_quantum_contribution(dirJ, dirE, dirB, h, dh, ddh, T, q, which_mm = which_mm)
     integrator(observable) = bz_integration_transport(observable, cpt, rel_tol = rel_tol, abs_tol = abs_tol)
     bz_vol = 1/(2pi)^length(cpt.xbounds) #if q had no units you would need to divide by a0

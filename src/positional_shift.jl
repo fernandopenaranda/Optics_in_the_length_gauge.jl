@@ -30,7 +30,7 @@ function quantum_contribution(a0, dirJ, dirE, dirB, h, dh, ddh, τ, T, cpt, whic
     checkdims(cpt.xbounds)
     checkantisym(dirJ,dirE,dirB)
     integrand(q) = integrand_quantum_contribution(dirJ, dirE, dirB, h, dh, ddh, T, q, which_mm = which_mm)
-    integrator(observable) = bz_integration_transport(observable, cpt, rel_tol = rel_tol, abs_tol = abs_tol)
+    integrator(observable) = bz_integration_transport_3d(observable, cpt, rel_tol = rel_tol, abs_tol = abs_tol)
     bz_vol = 1/(2pi)^length(cpt.xbounds) #if q had no units you would need to divide by a0
     val = bz_vol * integrator(integrand) # val has units of Å. the result integrand is in Angstroms times e^3/ħ^2 
     return val * 2π * e_o_ħ 

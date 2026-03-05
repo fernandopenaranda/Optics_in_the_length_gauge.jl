@@ -27,6 +27,7 @@ quantum_contribution(p::Quantum_correction_σijk_antisym) =
 quantum_contribution(p.a0, p.dirJ, p.dirE, p.dirB, p.h, p.nabla_h, p.nabla_nabla_h, p.τ, p.T, p.computation, p.which_mm)
 
 function quantum_contribution(a0, dirJ, dirE, dirB, h, dh, ddh, τ, T, cpt, which_mm)
+    println(cpt.xbounds)
     checkdims(length(cpt.xbounds))
     checkantisym(a,b,c)
     integrand(q) = integrand_quantum_contribution(dirJ, dirE, dirB, h, dh, ddh, T, q, which_mm = which_mm)

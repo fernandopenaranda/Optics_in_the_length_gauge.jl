@@ -28,6 +28,7 @@ module Optics_in_the_length_gauge
     const C_cd = ((e^2/ħ) |> u"μA/V").val
     const ħ_ev_s = (ħ |> u"eV*s").val
     const ang_to_m = 1e-10
+    const e_o_ħ = (e/ħ |> u"Å^-2*T^-1").val
 
     include("structs.jl")
     include("length_gauge_operators.jl")

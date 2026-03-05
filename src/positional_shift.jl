@@ -16,19 +16,25 @@ The current implementaion assumes a bulk (3D) system, generalization yet to come
 The magnetic moment has been written in general to accept both spin and 
 orbital contributions. The keyword `which_mm` by default `:orbital` selects the 
 orbital contribution only.
+
+Units the integrand times the differential is in length units, because the velocities are 
+in E * L, W = E * L^2, M = E * L^2
+
+the result is given in units of [1/(TÅ) * e^2/ħ]. T = Tesla
+val * e^2/h * 2pi * e/h 
 """
 quantum_contribution(p::Quantum_correction_σijk_antisym) = 
-quantum_contribution(p.a0, p.dirJ, p.dirE, p.dirB, p.h, p.dh, p.ddh, p.τ, p.T, p.cpt, 
-p.q, p.which_mm)
+quantum_contribution(p.a0, p.dirJ, p.dirE, p.dirB, p.h, p.dh, p.ddh, p.τ, p.T, p.computation, 
+    p.q, p.which_mm)
 
 function quantum_contribution(a0, dirJ, dirE, dirB, h, dh, ddh, τ, T, cpt, q, which_mm)
     checkdims(q)
     checkantisym(a,b,c)
     integrand(q) = integrand_quantum_contribution(dirJ, dirE, dirB, h, dh, ddh, T, q, which_mm = which_mm)
     integrator(observable) = bz_integration_transport(observable, cpt, rel_tol = rel_tol, abs_tol = abs_tol)
-    bz_vol = 1/(2pi*a0*ang_to_m)^length(q)
-    val = bz_vol * integrator(integrand)
-    return val
+    bz_vol = 1/(2pi)^length(q) #if q had no units you would need to divide by a0
+    val = bz_vol * integrator(integrand) # val has units of Å. the result integrand is in Angstroms times e^3/ħ^2 
+    return val * 2π * e_o_ħ 
 end
 "there is also a contribution coming from the spin magnetic moment (path disabled for the moment)
 f' * ∑_α (v_a F_{bc}^α - v_b F_{ac}^α + ϵ_{abd}Omega_d M_c^α).
@@ -44,11 +50,12 @@ end
 
 function integrand_quantum_contribution(a, b, c, ϵs, ψs, dh, ddh, T; which_mm = :orbital)
     ωs = Ω(ϵs)
-    vels = [v(:x,ψs,dh), v(:y,ψs,dh), v(:z,ψs,dh)] # factor needed
+    vels = [v(:x,ψs,dh), v(:y,ψs,dh), v(:z,ψs,dh)]  #units [E*L]
     vvels = [[dv(:x, :x, ψs, ddh), dv(:x, :y, ψs, ddh), dv(:x, :z, ψs, ddh)],
              [dv(:y, :x, ψs, ddh), dv(:y, :y, ψs, ddh), dv(:y, :z, ψs, ddh)],
-             [dv(:z, :x, ψs, ddh), dv(:z, :y, ψs, ddh), dv(:z, :z, ψs, ddh)]]   #* ang_to_m^2/ ħ_ev_s
-    return real(sum(d_f(ϵs, 0, T) .* (positional_shift(a, b, c, ωs, vels, vvels, which_mm = which_mm) .+ berry_OMM(a,b,c, ωs, vels, which_mm = which_mm))))
+             [dv(:z, :x, ψs, ddh), dv(:z, :y, ψs, ddh), dv(:z, :z, ψs, ddh)]] #units [E*L^2]
+    return real(sum(d_f(ϵs, 0, T) .* (positional_shift(a, b, c, ωs, vels, vvels, which_mm = which_mm) .+ 
+        berry_OMM(a,b,c, ωs, vels, which_mm = which_mm))))
 end
 """contribution to the quantum correction coming from the product of the Berry curvature and 
 the magnetic moment (orbital + spin). Spin deactivated."""
@@ -75,7 +82,7 @@ function Ωi(i, ωs, vels)
             s .+= ϵ(i,j,k) .* Ωi_aux(j,k, ωs ,vels)
         end
     end
-    return 1im .* s #hbar^2
+    return 1im .* s
 end
 function  Ωi_aux(j,k, ωs ,vels)
     vj = vels[symb_to_ind(j)]
@@ -187,10 +194,10 @@ end
 #_________________________________________________________________________________________
 
 v(a::Symbol,ψs, dh) = v(symb_to_ind(a),ψs, dh)
-v(a::Int,ψs, dh) = vel(ψs, dh[a]) #* ang_to_m/ ħ_ev_s
+v(a::Int,ψs, dh) = vel(ψs, dh[a])
 
 dv(a::Symbol, b::Symbol, ψs, ddh) = dv(symb_to_ind(a), symb_to_ind(b), ψs, ddh)
-dv(a::Int,b::Int, ψs, ddh) = vel(ψs, ddh[a][b]) #* ang_to_m/ ħ_ev_s
+dv(a::Int,b::Int, ψs, ddh) = vel(ψs, ddh[a][b])
 
 function symb_to_ind(a::Symbol)
     if a == :x

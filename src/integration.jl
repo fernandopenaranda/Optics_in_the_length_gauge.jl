@@ -39,8 +39,8 @@ bz_integration_transport_3d(f, p::Transport_computation_3d_presets; kws...) =
 function bz_integration_transport_3d(f, xbounds, ybounds, evals; rel_tol=1e-5, abs_tol=0)
     val, _ = Cubature.hcubature(
         f,
-        [xbounds[1], ybounds[1], zbounds[1]],
-        [xbounds[2], ybounds[2], zbounds[2]];
+        xbounds,
+        ybounds;
         reltol = rel_tol,
         abstol = abs_tol,
         maxevals = Int(round(evals))

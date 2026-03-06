@@ -129,7 +129,7 @@ function qm_int(a, c, d, ωs, vels, vvels)
     va = vels[symb_to_ind(a)]
     vc = vels[symb_to_ind(c)]
     vd = vels[symb_to_ind(d)]
-    Δd = diag(vd) .-  diag(vd)'
+    Δd = diag(vd) .-  transpose(diag(vd))
     ωs .+= diagm(ones(size(va,1))) # avoid 0/0
     va .-= diagm(diag(va))
     vc .-= diagm(diag(vc))
@@ -169,7 +169,7 @@ function omm_int(vb, vc, ωs)
     vb .-= diagm(vb_diag) # clean the diagonal entries so I don't need to exclude from the sum
     vc .-= diagm(vc_diag)
     ωs .+= diagm(ones(size(vb,1))) # I add dummy entries to the diagonal to avoid 0/0
-    M = vb * (vc ./ ωs) + (vb_diag .+ vb'_diag) .* (vc ./ ωs)
+    M = vb * (vc ./ ωs) + (vb_diag .+ transpose(vb_diag)) .* (vc ./ ωs)
 end
 #_________________________________________________________________________________________
 

@@ -39,12 +39,12 @@ end
 f' * ∑_α (v_a F_{bc}^α - v_b F_{ac}^α + ϵ_{abd}Omega_d M_c^α).
 Important not to confuse"
 function integrand_quantum_contribution(a, b, c, h, dh, ddh, T, q; which_mm = :orbital)
+    println("jey")
     ϵs, ψs = eigen(Matrix(h(q)))   
     dhs = [dh(q)[1],dh(q)[2],dh(q)[3]]
     ddhs = [[ddh(q)[1][1],ddh(q)[1][2],ddh(q)[1][3]], 
             [ddh(q)[2][1],ddh(q)[2][2],ddh(q)[2][3]],
             [ddh(q)[3][1],ddh(q)[3][2],ddh(q)[3][3]]]
-    println("jey")
     integrand_quantum_contribution(a, b, c, ϵs, ψs, dhs, ddhs, T, which_mm = which_mm)
 end
 

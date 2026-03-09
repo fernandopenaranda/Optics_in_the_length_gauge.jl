@@ -20,6 +20,7 @@ module Optics_in_the_length_gauge
     using SparseArrays
     using StaticArrays
     using Parameters
+    using QuasiMonteCarlo
     const kB = (PhysicalConstants.CODATA2018.k_B |> u"eV/K").val
     const μB = (PhysicalConstants.CODATA2018.BohrMagneton |> u"eV/T").val
     const ħ = PhysicalConstants.CODATA2018.ħ
@@ -29,6 +30,8 @@ module Optics_in_the_length_gauge
     const ħ_ev_s = (ħ |> u"eV*s").val
     const ang_to_m = 1e-10
     const e_o_ħ = (e/ħ |> u"Å^-2*T^-1").val
+    const g0 = (e^2/(ħ*2π) |> u"S").val
+    const e_o_ħ_m = (e/ħ |> u"m^-2*T^-1").val
 
     include("structs.jl")
     include("length_gauge_operators.jl")

@@ -18,6 +18,7 @@ end
     xbounds::SVector{3, Float64} #lowbounds
     ybounds::SVector{3, Float64} #topbounds
     evals::Number                # Max number of evaluations in adaptive integration
+    integration_method::Symbol = :hcubature # :montecarlo, :trivial
 end
 
 @with_kw struct DOS_presets
@@ -82,7 +83,7 @@ end
     with_shift::Bool# corrects the Planar_σijk with the constant factor that comes from the B field dependency in the bands
 end
 
-@with_kw struct Quantum_correction_σijk_antisym{H, DH, DDH} #valid in 3d and 2d if bounded along z
+@with_kw struct Quantum_correction_σijk_antisym{GS, H, DH, DDH} #valid in 3d and 2d if bounded along z
     a0::Float64
     dirJ::Symbol # i'th direction of σijk
     dirE::Symbol # j'th direction of σijk
@@ -90,10 +91,16 @@ end
     h::H # Hamiltonian H(k)
     nabla_h::DH # ∇_k H(k)
     nabla_nabla_h::DDH 
+    gs::GS # reciprocal lattice vectors
     τ::Float64 # scattering time
     T::Float64 # Temperature in K
     computation::Union{Optical_computation_presets, Transport_computation_presets, Transport_computation_3d_presets}
-    which_mm::Symbol
+    which_mm::Symbol # which magnetic moment (spin orbital or both). Orbital only by default
+    Ω_MM_switch = true # Omega_MM contribution
+    PS_switch = true  # Positional Shift contribution
+    QM_switch = true # Quantum metric contribution to the positional shift
+    fermi_surface::Bool
+    epsilon::Float64
 end
 
 @with_kw struct Planar_σijk_presets_spin

@@ -61,7 +61,8 @@ function bz_integration_transport_3d_hcubature(f, xbounds, ybounds, evals; rel_t
         abstol = abs_tol,
         maxevals = Int(round(evals))
     )
-    return val
+    return val # the product by the volume is already taken into account. Not needed as compared 
+    # to the funcitons below
 end
 
 function bz_integration_transport_3d_montecarlo(f, xbounds, ybounds, evals)

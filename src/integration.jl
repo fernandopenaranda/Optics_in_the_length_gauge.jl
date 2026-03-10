@@ -71,9 +71,9 @@ function bz_integration_transport_3d_montecarlo(f, xbounds, ybounds, evals)
     for i in 1:evals
         u = pts[:,i]
         x = xbounds + u .* (ybounds - xbounds)
-        acc += f(x)
+        acc +=  f(x)
     end
-    return acc / evals
+    return cube_volume(xbounds, ybounds) * acc / evals
 end
 
 function bz_integration_transport_3d_uniformgrid(f, xbounds, ybounds, evals)
@@ -90,7 +90,7 @@ function bz_integration_transport_3d_uniformgrid(f, xbounds, ybounds, evals)
         it += 1
         acc += f(SVector(x,y,z))
     end
-    return acc / it
+    return cube_volume(xbounds, ybounds) * acc / it
 end
 
 

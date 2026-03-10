@@ -33,7 +33,7 @@ function quantum_contribution(a0, dirJ, dirE, dirB, h, dh, ddh, Gs, τ, T, cpt, 
     PS_switch, QM_switch, fermi_surface, epsilon, rel_tol = 1e-5, abs_tol = 0)
     checkdims(cpt.xbounds)
     checkantisym(dirJ,dirE,dirB)
-    VBZ = bz_volume(Gs[1],Gs[2],Gs[3]) * cube_volume(cpt.xbounds, cpt.ybounds)
+    VBZ = bz_volume(Gs[1],Gs[2],Gs[3])
     # parametrization k -> us; k = u1b1+u2b2+u3b3
     # note q is passed in u_i ∈ [-0.5,0.5], with k = sum_i u_i * b_i
     integrand(q) = integrand_quantum_contribution_q(dirJ, dirE, dirB, h, dh, ddh, T, transform_k(q, Gs) , Ω_MM_switch, 

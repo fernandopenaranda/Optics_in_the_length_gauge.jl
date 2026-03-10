@@ -40,21 +40,25 @@ function bz_integration_transport(f, xbounds, ybounds, evals; rel_tol = 1e-5, ab
     return val
 end
 
-function bz_integration_transport_3d(f, p::Transport_computation_3d_presets; kws...)
+function bz_integration_transport_3d(f, p::Transport_computation_3d_presets, gs; kws...)
     if p.integration_method == :hcubature
         println("Adaptive integration")
-        bz_integration_transport_3d_hcubature(f, p.xbounds, p.ybounds, p.evals; kws...) 
+        bz_integration_transport_3d_hcubature(f, p.xbounds, p.ybounds, p.evals, gs; kws...) 
     elseif p.integration_method == :montecarlo
         println("Montecarlo integration")
-        bz_integration_transport_3d_montecarlo(f, p.xbounds, p.ybounds, p.evals)
+        bz_integration_transport_3d_montecarlo(f, p.xbounds, p.ybounds, p.evals, gs)
     elseif p.integration_method == :uniform_grid
         println("Uniform integration")
-        bz_integration_transport_3d_uniformgrid(f, p.xbounds, p.ybounds, p.evals)
+        bz_integration_transport_3d_uniformgrid(f, p.xbounds, p.ybounds, p.evals, gs)
+    elseif p.integration_method == :c3_grid
+        println("C3 grid integration")
+        bz_integration_transport_3d_c3grid(f, p.xbounds, p.ybounds, p.evals, gs)
     else 0.0 end
 end
-function bz_integration_transport_3d_hcubature(f, xbounds, ybounds, evals; rel_tol=1e-5, abs_tol=0)
+function bz_integration_transport_3d_hcubature(f, xbounds, ybounds, evals, gs; rel_tol=1e-5, abs_tol=0)
+    ff(q) = f(transform_k(q, gs))
     val, _ = Cubature.hcubature(
-        f,
+        ff,
         xbounds,
         ybounds;
         reltol = rel_tol,
@@ -65,19 +69,19 @@ function bz_integration_transport_3d_hcubature(f, xbounds, ybounds, evals; rel_t
     # to the funcitons below
 end
 
-function bz_integration_transport_3d_montecarlo(f, xbounds, ybounds, evals)
+function bz_integration_transport_3d_montecarlo(f, xbounds, ybounds, evals, gs)
     dim = length(xbounds)
     pts = QuasiMonteCarlo.sample(evals, dim, SobolSample())
     acc = 0.0
     for i in 1:evals
         u = pts[:,i]
         x = xbounds + u .* (ybounds - xbounds)
-        acc +=  f(x)
+        acc +=  f(transform_k(x, gs))
     end
     return cube_volume(xbounds, ybounds) * acc / evals
 end
 
-function bz_integration_transport_3d_uniformgrid(f, xbounds, ybounds, evals)
+function bz_integration_transport_3d_uniformgrid(f, xbounds, ybounds, evals, gs)
     N = floor(Int, evals^(1/3))
     it = 0
     if N == 0
@@ -89,11 +93,39 @@ function bz_integration_transport_3d_uniformgrid(f, xbounds, ybounds, evals)
     acc = 0.0
     for x in xs, y in ys, z in zs
         it += 1
-        acc += f(SVector(x,y,z))
+        acc += f(transform_k(SVector(x,y,z), gs))
     end
     return cube_volume(xbounds, ybounds) * acc / it
 end
 
+function bz_integration_transport_3d_c3grid(f, xbounds, ybounds, evals, gs) # wrong
+    Nbase = div(evals, 3) 
+    Nx = floor(Int, Nbase^(1/3))
+    Ny = Nx
+    Nz = max(1, floor(Int, Nbase/(Nx*Ny)))
+    xs = range(xbounds[1], ybounds[1], length=Nx)
+    ys = range(xbounds[2], ybounds[2], length=Ny)
+    zs = range(xbounds[3], ybounds[3], length=Nz)
+    V = cube_volume(xbounds, ybounds) 
+    acc = 0.0
+    count = 0
+    for x in xs, y in ys, z in zs
+        k  = [x,y,z]
+        # C3 rotations around z
+        k1 = k
+        k2 = [-0.5*x - √3/2*y,  √3/2*x - 0.5*y, z]
+        k3 = [-0.5*x + √3/2*y, -√3/2*x - 0.5*y, z]
+
+        acc += f(k1)
+        acc += f(k2)
+        acc += f(k3)
+        count += 3
+        if count ≥ evals
+            return V * acc / count
+        end
+    end
+    return V * acc / count
+end
 
 
 bz_volume(b1,b2,b3) = abs(dot(b1, cross(b2,b3)))

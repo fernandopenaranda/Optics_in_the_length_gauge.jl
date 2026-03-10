@@ -36,9 +36,9 @@ function quantum_contribution(a0, dirJ, dirE, dirB, h, dh, ddh, Gs, τ, T, cpt, 
     VBZ = bz_volume(Gs[1],Gs[2],Gs[3])
     # parametrization k -> us; k = u1b1+u2b2+u3b3
     # note q is passed in u_i ∈ [-0.5,0.5], with k = sum_i u_i * b_i
-    integrand(q) = integrand_quantum_contribution_q(dirJ, dirE, dirB, h, dh, ddh, T, transform_k(q, Gs) , Ω_MM_switch, 
+    integrand(q) = integrand_quantum_contribution_q(dirJ, dirE, dirB, h, dh, ddh, T, q, Ω_MM_switch, 
         PS_switch, QM_switch, fermi_surface, epsilon, which_mm = which_mm)
-    integrator(observable) = bz_integration_transport_3d(observable, cpt, rel_tol = rel_tol, abs_tol = abs_tol)
+    integrator(observable) = bz_integration_transport_3d(observable, cpt, Gs, rel_tol = rel_tol, abs_tol = abs_tol)
     bz_vol = VBZ/(2pi)^length(cpt.xbounds) #if q had no units you would need to divide by a0
     val = bz_vol * integrator(integrand)# val has units of Å. the result integrand is in Angstroms times e^3/ħ^2 
     return  val * g0 * π * e_o_ħ_m * ang_to_m  #units of S/(mT)

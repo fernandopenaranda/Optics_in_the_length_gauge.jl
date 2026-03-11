@@ -58,20 +58,23 @@ end
 
 function integrand_quantum_contribution(a, b, c, ϵs, ψs, dh, ddh, T, Ω_MM_switch, 
     PS_switch, QM_switch, which_mm, fermi_surface, ϵ = 1e-5)
-    ωs = Ω(ϵs)
-    ωs .+= (findmax(abs.(ωs))[1]) * ϵ # this is to avoid divergences at band crossings.
+    ϵ = kB*T
+    ωs = Ω(ϵs) .+ ϵ
     vels = [v(:x,ψs,dh), v(:y,ψs,dh), v(:z,ψs,dh)]  #units [E*L]
-    vvels = [[dv(:x, :x, ψs, ddh), dv(:x, :y, ψs, ddh), dv(:x, :z, ψs, ddh)],
-             [dv(:y, :x, ψs, ddh), dv(:y, :y, ψs, ddh), dv(:y, :z, ψs, ddh)],
-             [dv(:z, :x, ψs, ddh), dv(:z, :y, ψs, ddh), dv(:z, :z, ψs, ddh)]] #units [E*L^2]
+    vvels = d_vs(ψs, ddh) #units [E*L^2]
     if fermi_surface == false
         return real(sum(d_f(ϵs, 0, T) .* (ifelse(PS_switch == true, 1, 0) .* 
             positional_shift(a, b, c, ωs, vels, vvels, QM_switch, which_mm = which_mm) .+ 
             ifelse(Ω_MM_switch == true, 1, 0) .* berry_OMM(a,b,c, ωs, vels, which_mm = which_mm))))
     else 
+        # return real(ϵs[1])
         return real(sum(d_f(ϵs, 0, T))) # DOS
     end
 end
+
+d_vs(ψs, ddh) = [[dv(:x, :x, ψs, ddh), dv(:x, :y, ψs, ddh), dv(:x, :z, ψs, ddh)],
+    [dv(:y, :x, ψs, ddh), dv(:y, :y, ψs, ddh), dv(:y, :z, ψs, ddh)],
+    [dv(:z, :x, ψs, ddh), dv(:z, :y, ψs, ddh), dv(:z, :z, ψs, ddh)]] 
 
 """contribution to the quantum correction coming from the product of the Berry curvature and 
 the magnetic moment (orbital + spin). Spin deactivated.
@@ -79,7 +82,7 @@ Note that M in this expression is diagonal. That is it is the OMM of band n"""
 function berry_OMM(a,b,c, ωs, vels; which_mm = :orbital)
     s = zeros(ComplexF64, size(ωs,1))
     for d in [:x,:y,:z]
-        s .+= ϵ(a,b,d) .* Ωi(d, ωs, vels) .* diag(interband_MM(c, ωs, vels, which_mm = which_mm))
+        s .+= levi_civita(a,b,d) .* Ωi(d, ωs, vels) .* diag(interband_MM(c, ωs, vels, which_mm = which_mm))
     end
     return s
 end
@@ -92,10 +95,10 @@ valid in quasi 2d systems with z-bounded direction.
 function Ωi(i, ωs, vels) 
     s = zeros(ComplexF64, size(ωs,1))
     coords = [:x,:y,:z]
-    ωs .+= diagm(ones(size(ωs,1))) 
+    # ωs .+= diagm(ones(size(ωs,1))) 
     for j in coords
         for k in coords
-            s .+= ϵ(i,j,k) .* Ωi_aux(j,k, ωs ,vels)
+            s .+= levi_civita(i,j,k) .* Ωi_aux(j,k, ωs ,vels)
         end
     end
     return 1im .* s
@@ -124,10 +127,25 @@ alternative return (slower) but equivalent:
     # return 2*real.(diag(va * (interband_MM(b, ωs, vels, which_mm = which_mm) ./ (ωs .^2))))  
         + 0 .* 1/2 * real(contracted_sum_qm(a, b, ωs, vels, vvels))
 """
+
+
+function F(p::Quantum_correction_σijk_antisym, q,a,b)
+    ϵs, ψs = eigen(Matrix(p.h(q)))   
+    dhs = [p. nabla_h(q)[1],p. nabla_h(q)[2],p. nabla_h(q)[3]]
+    ddhs = [[p.nabla_nabla_h(q)[1][1],p.nabla_nabla_h(q)[1][2],p.nabla_nabla_h(q)[1][3]], 
+        [p.nabla_nabla_h(q)[2][1],p.nabla_nabla_h(q)[2][2],p.nabla_nabla_h(q)[2][3]],
+        [p.nabla_nabla_h(q)[3][1],p.nabla_nabla_h(q)[3][2],p.nabla_nabla_h(q)[3][3]]]
+    ϵ = kB*p.T
+    ωs_epsilon = Ω(ϵs) .+ ϵ #(findmax(abs.(ωs))[1]) * ϵ # this is to avoid divergences at band crossings.
+    vels = [v(:x,ψs,dhs), v(:y,ψs,dhs), v(:z,ψs,dhs)]  #units [E*L]
+    vvels = d_vs(ψs, ddhs) #units [E*L^2]
+    return F(a, b, ωs_epsilon, vels, vvels, p.QM_switch; which_mm = :orbital)   
+end
+
 function F(a, b, ωs, vels, vvels, QM_switch; which_mm = :orbital)   
     va = vels[symb_to_ind(a)]
-    va .-= diagm(diag(va))
-    return 2*real.(vec(sum(va .* transpose(interband_MM(b, ωs, vels, which_mm = which_mm) ./ (ωs .^2)),
+    nd_va = copy(va) - diagm(diag(va))
+    return 2*real.(vec(sum(nd_va .* transpose(interband_MM(b, ωs, vels, which_mm = which_mm) ./ (ωs .^2)),
          dims=2))) + ifelse(QM_switch == true, 1, 0) .* 1/2 * 
         real(contracted_sum_qm(a, b, ωs, vels, vvels)) # vectorized version
 end
@@ -140,7 +158,7 @@ function contracted_sum_qm(a, b, ωs,vels, vvels; which_mm = :orbital)
     cords = [:x,:y,:z]
     for c in cords
         for d in cords
-            s += ϵ(b,c,d) .* qm_int(a, c, d, ωs,vels, vvels)  
+            s += levi_civita(b,c,d) .* qm_int(a, c, d, ωs,vels, vvels)  
         end
     end
     return real(s)
@@ -151,10 +169,10 @@ function qm_int(a, c, d, ωs, vels, vvels)
     vc = vels[symb_to_ind(c)]
     vd = vels[symb_to_ind(d)]
     Δd = diag(vd) .-  transpose(diag(vd))
-    va .-= diagm(diag(va))
-    vc .-= diagm(diag(vc))
-    vd .-= diagm(diag(vd)) # because va[n,n] = 0 i can sum over all m
-    return diag((Δd .* va ./ ωs .^ 3) * vc) + diag((vd ./ ωs .^ 2)  * vvels[symb_to_ind(a)][symb_to_ind(c)])
+    nd_va = copy(va) - diagm(diag(va))
+    nd_vc = copy(vc) - diagm(diag(vc))
+    nd_vd = copy(vd) - diagm(diag(vd))
+    return diag((Δd .* nd_va ./ ωs .^ 3) * nd_vc) + diag((nd_vd ./ ωs .^ 2)  * vvels[symb_to_ind(a)][symb_to_ind(c)])
 end
 
 """ interband magnetic moment with orbital and spin parts """
@@ -177,7 +195,7 @@ function interband_OMM(a, ωs, vels)
     s = zeros(ComplexF64, size(ωs,1), size(ωs,1))
     for b in cords
         for c in cords
-            s .+= ϵ(a, b, c) .* omm_int(vels[symb_to_ind(b)], vels[symb_to_ind(c)], ωs)
+            s .+= levi_civita(a, b, c) .* omm_int(vels[symb_to_ind(b)], vels[symb_to_ind(c)], ωs)
         end
     end
     return  s # the -i is the result of writting the off-diagonal terms of the connections as velocities
@@ -185,24 +203,23 @@ end
 
 function omm_int(vb, vc, ωs)
     vb_diag = diag(vb) # store the diagonal elements
-    vc_diag = diag(vc)
-    vb .-= diagm(vb_diag) # clean the diagonal entries so I don't need to exclude from the sum
-    vc .-= diagm(vc_diag)
-    ωs .+= diagm(ones(size(vb,1))) # I add dummy entries to the diagonal to avoid 0/0
-    M =  vb * (vc ./ ωs) +  (vb_diag .+ transpose(vb_diag)) .* (vc ./ ωs)
+    non_diagvb = copy(vb) - diagm(diag(vb))
+    non_diagvc = copy(vc)- diagm(diag(vc))
+    M = non_diagvb * (non_diagvc  ./ ωs) +  (vb_diag .+ transpose(vb_diag)) .* (non_diagvc  ./ ωs)
     return M .* (-1im/2)
 end
+
 #_________________________________________________________________________________________
 
 function contracted_sum_qm(a::Symbol, b::Symbol, c::Symbol)
     s = 0.0
     for d in [:x,:y,:z]
-        s += ϵ(b, c, d) * partial_quantum_metric(c, d, a)
+        s += levi_civita(b, c, d) * partial_quantum_metric(c, d, a)
     end
     return s
 end
 
-function ϵ(i::Symbol, j::Symbol, k::Symbol)
+function levi_civita(i::Symbol, j::Symbol, k::Symbol)
     perm = (i, j, k)
     if length(unique(perm)) < 3
         return 0

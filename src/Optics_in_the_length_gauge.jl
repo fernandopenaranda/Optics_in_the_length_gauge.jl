@@ -32,12 +32,14 @@ module Optics_in_the_length_gauge
     const e_o_ħ = (e/ħ |> u"Å^-2*T^-1").val
     const g0 = (e^2/(ħ*2π) |> u"S").val
     const e_o_ħ_m = (e/ħ |> u"m^-2*T^-1").val
+    const ecube_hbarsquared = (e^3/ħ^2 |> u"S/(m^2*T)").val
 
     include("structs.jl")
     include("length_gauge_operators.jl")
     include("expected_values.jl")
     include("integration.jl")
     include("jdos.jl")
+    include("interband_OMM.jl")
     include("linear_optical_conductivity.jl")
     include("drude_conductivity.jl")
     include("quantum_anomalous_hall_conductivity.jl")
@@ -45,9 +47,9 @@ module Optics_in_the_length_gauge
     include("linear_magneto_transport_spin.jl")
     include("positional_shift.jl")
     #...
-    export Optical_computation_presets, Transport_computation_presets, DOS_presets, JDOS_presets, σij_presets, Drude_presets, AH_presets, Planar_σijk_presets_orbital, Planar_σijk_presets_spin, Quantum_correction_σijk_antisym
-    export dos, jdos, filling, expected_value, linear_optical_conductivity, drude_conductivity, σij_anomalous_hall, linear_magneto_conductivity_orbital, linear_magneto_conductivity_spin, linear_magneto_conductivity, positional_shift, F
-    export bz_integration_transport_3d, Transport_computation_3d_presets, quantum_contribution
+    export Optical_computation_presets, Transport_computation_presets, DOS_presets, JDOS_presets, σij_presets, Drude_presets, AH_presets, AH_presets_3d, Planar_σijk_presets_orbital, Planar_σijk_presets_spin, Quantum_correction_σijk_antisym, OMM_presets
+    export dos, jdos, filling, expected_value, linear_optical_conductivity, drude_conductivity, σij_anomalous_hall, linear_magneto_conductivity_orbital, linear_magneto_conductivity_spin, linear_magneto_conductivity, positional_shift, F, interband_OMM
+    export bz_integration_transport_3d, Transport_computation_3d_presets, quantum_contribution, k_mesh_eval
     # Export the presets submodule
     export Presets 
     include("presets/MLG_ham.jl") 

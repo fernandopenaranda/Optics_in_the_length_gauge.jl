@@ -15,8 +15,8 @@ end
 end
 
 @with_kw struct Transport_computation_3d_presets
-    xbounds::SVector{3, Float64} #lowbounds
-    ybounds::SVector{3, Float64} #topbounds
+    xbounds#lowbounds
+    ybounds#topbounds
     evals::Number                # Max number of evaluations in adaptive integration
     integration_method::Symbol = :hcubature # :montecarlo, :trivial
 end
@@ -31,6 +31,12 @@ end
     a0::Float64
     h::Function # Hamiltonian H(k)
     computation::Union{Optical_computation_presets, Transport_computation_presets}
+end
+
+@with_kw struct OMM_presets{H,DH}
+    dir::Symbol
+    h::H # Hamiltonian H(k)
+    nabla_h::DH # ∇_k H(k)
 end
 
 @with_kw struct σij_presets
@@ -62,7 +68,18 @@ end
     h::Function # Hamiltonian H(k)
     dh::Function # x, y, k-derivative of H(k): [dhx, dhy]
     T::Float64
-    computation::Union{Optical_computation_presets, Transport_computation_presets}
+    computation::Union{Optical_computation_presets, Transport_computation_presets,Transport_computation_3d_presets }
+end
+
+@with_kw struct AH_presets_3d{GS}
+    a0::Float64
+    dirJ::Symbol # i'th direction of σij in i = {x, y}
+    dirE::Symbol # j'th direction of σij in j = {y, x}
+    h::Function # Hamiltonian H(k)
+    dh::Function # x, y, k-derivative of H(k): [dhx, dhy]
+    T::Float64
+    computation::Union{Transport_computation_3d_presets}
+    gs::GS # reciprocal lattice vectors
 end
 
 @with_kw struct Planar_σijk_presets_orbital{H, DH, DDH, RZ} # to be generalized to other directions and out of plane then change planar

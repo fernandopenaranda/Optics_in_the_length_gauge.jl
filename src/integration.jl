@@ -65,7 +65,7 @@ function bz_integration_transport_3d_hcubature(f, xbounds, ybounds, evals, gs; r
     return val
 end
 
-function bz_integration_transport_3d_montecarlo(f, xbounds, ybounds, evals, gs)
+function bz_integration_transport_3d_montecarlo(f, xbounds, ybounds, evals, gs)    
     dim = length(xbounds)
     pts = QuasiMonteCarlo.sample(evals, dim, SobolSample())
     acc = 0.0
@@ -84,7 +84,6 @@ function bz_integration_transport_3d_uniformgrid(f, xbounds, ybounds, evals, gs)
         throw(ArgumentError("N = 0, increase number of evals"))
     end
     if length(xbounds) == 3
-        println("3")
         xs = range(xbounds[1], ybounds[1], length=N)
         ys = range(xbounds[2], ybounds[2], length=N)
         zs = range(xbounds[3], ybounds[3], length=N)
@@ -111,6 +110,13 @@ end
 
 
 
+function bz_volume(bs)
+    if length(bs) == 3
+        bz_volume(bs[1],bs[2],bs[3]) 
+    else
+        bz_volume(bs[1], bs[2])
+    end
+end
 
 bz_volume(b1,b2,b3) = abs(dot(b1, cross(b2,b3)))
 bz_volume(b1, b2) = abs(b1[1]*b2[2] - b1[2]*b2[1])

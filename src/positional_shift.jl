@@ -6,6 +6,7 @@
 
 # function integrand_classical_contribution()
 # end
+# Important, all the 2D paths assume the z direction as bounded and x y to lay on the plane.
 """
 quantum contribution to σijk^(A,1)
 Implementation of the correction to the classical σ_ijk^(A,1)
@@ -23,8 +24,10 @@ Units the integrand times the differential is in length units, because the veloc
 in E * L, W = E * L^2, M = E * L^2
 # parametrization k -> us; k = u1b1+u2b2+u3b3
     # note q is passed in u_i ∈ [-0.5,0.5], with k = sum_i u_i * b_i
-the result is given in units of (S/mT) 
-val * 2e^2/h * pi * e/ħ = val * g0 * pi*e/ħ
+the result is given in units of (S/m/T) 
+Note that the units are ecube_hbarsquared because the velocity is expressed as [E][L] 
+in the code insted of [L]/[T].
+
 """
 quantum_contribution(p::Quantum_correction_σijk_antisym) = 
     quantum_contribution(p.a0, p.dirJ, p.dirE, p.dirB, p.h, p.nabla_h, 
@@ -35,31 +38,38 @@ function quantum_contribution(a0, dirJ, dirE, dirB, h, dh, ddh, Gs, τ, T, cpt, 
     PS_switch, QM_switch, fermi_surface, epsilon, rel_tol = 1e-5, abs_tol = 0)
     checkdims(cpt.xbounds)
     checkantisym(dirJ,dirE,dirB)
-    VBZ = bz_volume(Gs[1],Gs[2],Gs[3])
+    VBZ = bz_volume(Gs)
     integrand(q) = integrand_quantum_contribution_q(dirJ, dirE, dirB, h, dh, ddh,
          T, q, Ω_MM_switch,  PS_switch, QM_switch, fermi_surface, epsilon, which_mm = which_mm)
     integrator(observable) = bz_integration_transport_3d(observable, cpt, Gs,
          rel_tol = rel_tol, abs_tol = abs_tol)
     bz_vol = VBZ/(2pi)^length(cpt.xbounds) # No a0 in the denominator
     val = bz_vol * integrator(integrand)#  Integral -) Å. Prefactor e^3/ħ^2 
-    # return  val * g0 * π * e_o_ħ_m * ang_to_m  #units of S/(mT)
-    return  val * ecube_hbarsquared * ang_to_m
+    
+    return  val * ecube_hbarsquared * ang_to_m #units of S/m/T
 end
 "there is also a contribution coming from the spin magnetic moment (path disabled for the moment)
 f' * ∑_α (v_a F_{bc}^α - v_b F_{ac}^α + ϵ_{abd}Omega_d M_c^α).
 Important not to confuse"
 
 integrand_quantum_contribution_q(p, q) = integrand_quantum_contribution_q(p.dirJ, p.dirE, p.dirB, p.h, 
-    p.nabla_h, p.nabla_nabla_h, p.T, q, p.Ω_MM_switch, p.PS_switch, 
+    p.nabla_h, p.nabla_nabla_h, p.T, collect(q), p.Ω_MM_switch, p.PS_switch, 
     p.QM_switch, p.fermi_surface, p.epsilon, which_mm = p.which_mm)
 
-function integrand_quantum_contribution_q(a, b, c, h, dh, ddh, T, q::Array, Ω_MM_switch, 
+function integrand_quantum_contribution_q(a, b, c, h, dh, ddh, T, q, Ω_MM_switch, 
     PS_switch, QM_switch, fermi_surface, epsilon; which_mm = :orbital)
-    ϵs, ψs = eigen(Matrix(h(q)))   
-    dhs = [dh(q)[1],dh(q)[2],dh(q)[3]]
-    ddhs = [[ddh(q)[1][1],ddh(q)[1][2],ddh(q)[1][3]], 
-            [ddh(q)[2][1],ddh(q)[2][2],ddh(q)[2][3]],
-            [ddh(q)[3][1],ddh(q)[3][2],ddh(q)[3][3]]]
+    if length(q) == 3
+        ϵs, ψs = eigen(Matrix(h(q)))   
+        dhs = [dh(q)[1],dh(q)[2],dh(q)[3]]
+        ddhs = [[ddh(q)[1][1],ddh(q)[1][2],ddh(q)[1][3]], 
+                [ddh(q)[2][1],ddh(q)[2][2],ddh(q)[2][3]],
+                [ddh(q)[3][1],ddh(q)[3][2],ddh(q)[3][3]]]
+    else length(q) == 2
+        ϵs, ψs = eigen(Matrix(h(q)))   
+        dhs = [dh(q)[1],dh(q)[2]]
+        ddhs = [[ddh(q)[1][1],ddh(q)[1][2]], 
+                [ddh(q)[2][1],ddh(q)[2][2]]]
+    end
     integrand_quantum_contribution(a, b, c, ϵs, ψs, dhs, ddhs, T, Ω_MM_switch, 
         PS_switch, QM_switch, which_mm, fermi_surface, epsilon)
 end
@@ -67,45 +77,90 @@ end
 function integrand_quantum_contribution(a, b, c, ϵs, ψs, dh, ddh, T, Ω_MM_switch, 
     PS_switch, QM_switch, which_mm, fermi_surface, ϵ = 1e-5)
     ϵ = kB*T
-    ωs = Ω(ϵs) .+ im*ϵ
-    vels = [v(:x,ψs,dh), v(:y,ψs,dh), v(:z,ψs,dh)]  #units [E*L]
-    vvels = d_vs(ψs, ddh) #units [E*L^2]
+    ωs = Ω(ϵs) .+ 0im 
+    ωs[real(ωs) .< 1e-4] .+= im*ϵ
+    if length(dh) == 3
+        vels = [v(:x,ψs,dh), v(:y,ψs,dh), v(:z,ψs,dh)]  #units [E*L]
+        vvels = d_3dvs(ψs, ddh)
+    else length(dh) == 2 # this path assumes z to be bounded
+        vels = [v(:x,ψs,dh), v(:y,ψs,dh)]  #units [E*L]
+        vvels = d_2dvs(ψs, ddh)
+    end
     if fermi_surface == false
         return real(sum(d_f(ϵs, 0, T) .* (ifelse(PS_switch == true, 1, 0) .* 
             positional_shift(a, b, c, ωs, vels, vvels, QM_switch, which_mm = which_mm) .+ 
             ifelse(Ω_MM_switch == true, 1, 0) .* berry_OMM(a,b,c, ωs, vels, which_mm = which_mm))))
-
-        # real(sum((ifelse(PS_switch == true, 1, 0) .* 
-        #     positional_shift(a, b, c, ωs, vels, vvels, QM_switch, which_mm = which_mm) .+ 
-        #     ifelse(Ω_MM_switch == true, 1, 0) .* berry_OMM(a,b,c, ωs, vels, which_mm = which_mm))))
     else 
         return real(sum(-d_f(ϵs, 0, T))) # DOS
     end
 end
 
-d_vs(ψs, ddh) = [[dv(:x, :x, ψs, ddh), dv(:x, :y, ψs, ddh), dv(:x, :z, ψs, ddh)],
+d_2dvs(ψs, ddh) = [[dv(:x, :x, ψs, ddh), dv(:x, :y, ψs, ddh)],
+    [dv(:y, :x, ψs, ddh), dv(:y, :y, ψs, ddh)]] 
+
+d_3dvs(ψs, ddh) = [[dv(:x, :x, ψs, ddh), dv(:x, :y, ψs, ddh), dv(:x, :z, ψs, ddh)],
     [dv(:y, :x, ψs, ddh), dv(:y, :y, ψs, ddh), dv(:y, :z, ψs, ddh)],
     [dv(:z, :x, ψs, ddh), dv(:z, :y, ψs, ddh), dv(:z, :z, ψs, ddh)]] 
 
 """contribution to the quantum correction coming from the product of the Berry curvature and 
 the magnetic moment (orbital + spin). Spin deactivated.
-Note that M in this expression is diagonal. That is it is the OMM of band n"""
+Note that M in this expression is diagonal. That is it is the OMM of band n
+The two expressed functions are equivalent. """
 function berry_OMM(a,b,c, ωs, vels; which_mm = :orbital)
     s = zeros(ComplexF64, size(ωs,1))
-    for d in [:x,:y,:z]
-        s .+= levi_civita(a,b,d) .* Ωi(d, ωs, vels) .* diag(interband_MM(c, ωs, vels, which_mm = which_mm))
-    end
+    s .+= Ωab(a, b, ωs, vels) .* diag(interband_MM(c, ωs, vels; which_mm))
     return s
 end
-
 
 """ contribution to the quantum correction to σ_ijk^(A,1) coming from the positional 
 shift contribution F """
 function positional_shift(a, b, c, ωs, vels, vvels, QM_switch; which_mm = :orbital) 
     va = vels[symb_to_ind(a)]
     vb = vels[symb_to_ind(b)]
-    return diag(va) .* F(b,c, ωs, vels, vvels, QM_switch, which_mm = which_mm) .- 
-        diag(vb) .* F(a, c, ωs, vels, vvels, QM_switch, which_mm = which_mm) 
+    return diag(va) .* F(c, b, ωs, vels, vvels, QM_switch, which_mm = which_mm) .- 
+        diag(vb) .* F(c, a, ωs, vels, vvels, QM_switch, which_mm = which_mm) 
+ end
+
+ function F(a, b, ωs, vels, vvels, QM_switch; which_mm = :orbital)   
+    va = vels[symb_to_ind(a)]
+    nd_va = copy(va) - diagm(diag(va))
+
+    vb = vels[symb_to_ind(b)]
+    nd_vb = copy(vb) - diagm(diag(vb))
+    dim =  size(ωs,1)
+    s = zeros(ComplexF64, dim)
+    for n in 1:dim
+        for m in 1:dim
+            if n ≠ m
+                s[n] += -im * interband_MM(a, ωs, vels, which_mm = which_mm)[n,m] * nd_vb[m,n] /(ωs[n,m]*ωs[m,n])
+            end
+        end
+    end
+    return -2*real(s) - 1/2 * ifelse(QM_switch == true, 1, 0) .* real(contracted_sum_qm(a, b, ωs, vels, vvels))
+end
+
+"""
+levi civita contracted. ωs are energy differences not to confuse with ϵs
+"""
+function contracted_sum_qm(a, b, ωs,vels, vvels; which_mm = :orbital)
+    s = zeros(ComplexF64, size(ωs,1))
+    for (c,d,sign) in allowed_components(a)
+        s += sign .* qm_int(b, c, d, ωs,vels, vvels)
+    end
+    return s
+end
+
+function qm_int(a, c, d, ωs, vels, vvels)
+    ωs_safe = copy(ωs) #.+ 1e-2*im
+    va = vels[symb_to_ind(a)]
+    vc = vels[symb_to_ind(c)]
+    vd = vels[symb_to_ind(d)]
+    Δd = diag(vd) .-  transpose(diag(vd))
+    nd_va = copy(va) - diagm(diag(va))
+    nd_vc = copy(vc) - diagm(diag(vc))
+    nd_vd = copy(vd) - diagm(diag(vd))
+    return diag((Δd .* nd_va ./ ωs_safe .^ 3) * nd_vc) + 
+        diag((nd_vd ./ ωs_safe .^ 2)  * vvels[symb_to_ind(a)][symb_to_ind(c)])
 end
 
 """
@@ -123,44 +178,66 @@ function F(p::Quantum_correction_σijk_antisym, q,a,b)
         [p.nabla_nabla_h(q)[2][1],p.nabla_nabla_h(q)[2][2],p.nabla_nabla_h(q)[2][3]],
         [p.nabla_nabla_h(q)[3][1],p.nabla_nabla_h(q)[3][2],p.nabla_nabla_h(q)[3][3]]]
     ϵ = kB*p.T
-    ωs_epsilon = Ω(ϵs) .+ 1im*ϵ/1000 #(findmax(abs.(ωs))[1]) * ϵ # this is to avoid divergences at band crossings.
+    ωs_epsilon = Ω(ϵs) .+ 0im 
+    ωs_epsilon[real(ωs_epsilon) .< 1e-5] .+=  im*ϵ # this is to avoid divergences at band crossings.
     vels = [v(:x,ψs,dhs), v(:y,ψs,dhs), v(:z,ψs,dhs)]  #units [E*L]
-    vvels = d_vs(ψs, ddhs) #units [E*L^2]
-    return F(a, b, ωs_epsilon, vels, vvels, p.QM_switch; which_mm = :orbital)   
+    vvels = d_3dvs(ψs, ddhs) #units [E*L^2]
+    return real.(F(a, b, ωs_epsilon, vels, vvels, p.QM_switch; which_mm = :orbital)) #.* real.(diag(vels[1])) # the commented is only for rapid access to vi fij do not consider it seriously
+    
 end
 
-function F(a, b, ωs, vels, vvels, QM_switch; which_mm = :orbital)   
-    va = vels[symb_to_ind(a)]
-    nd_va = copy(va) - diagm(diag(va))
-    return 2*real.(vec(sum((nd_va ./ ωs .^2) .* transpose(interband_MM(b, ωs, vels, which_mm = which_mm)),
-         dims=2))) + ifelse(QM_switch == true, 1, 0) .* 1/2 * 
-        real(contracted_sum_qm(a, b, ωs, vels, vvels)) # vectorized version
-end
 
-"""
-levi civita contracted. ωs are energy differences not to confuse with ϵs
-"""
-function contracted_sum_qm(a, b, ωs,vels, vvels; which_mm = :orbital)
-    s = zeros(ComplexF64, size(ωs,1))
-    cords = [:x,:y,:z]
-    for c in cords
-        for d in cords
-            s += levi_civita(b,c,d) .* qm_int(a, c, d, ωs,vels, vvels)  
-        end
-    end
-    return real(s)
-end
+# function F_2(p::Quantum_correction_σijk_antisym, q,a,b)
+#     ϵs, ψs = eigen(Matrix(p.h(q)))   
+#     dhs = [p.nabla_h(q)[1],p.nabla_h(q)[2],p.nabla_h(q)[3]]
+#     ddhs = [[p.nabla_nabla_h(q)[1][1],p.nabla_nabla_h(q)[1][2],p.nabla_nabla_h(q)[1][3]], 
+#         [p.nabla_nabla_h(q)[2][1],p.nabla_nabla_h(q)[2][2],p.nabla_nabla_h(q)[2][3]],
+#         [p.nabla_nabla_h(q)[3][1],p.nabla_nabla_h(q)[3][2],p.nabla_nabla_h(q)[3][3]]]
+#     ϵ = kB*p.T
+#     ωs_safe = Ω(ϵs)  .+ 0.0im
+#     ωs_safe[real(ωs_safe) .< 1e-4] .+= im*ϵ
+#     vels = [v(:x,ψs,dhs), v(:y,ψs,dhs), v(:z,ψs,dhs)]  #units [E*L]
+#     vvels = d_3dvs(ψs, ddhs) #units [E*L^2]
+#     return real.(F_2(a, b, ωs_safe, vels, vvels, p.QM_switch; which_mm = :orbital))
+# end
 
-function qm_int(a, c, d, ωs, vels, vvels)
-    va = vels[symb_to_ind(a)]
-    vc = vels[symb_to_ind(c)]
-    vd = vels[symb_to_ind(d)]
-    Δd = diag(vd) .-  transpose(diag(vd))
-    nd_va = copy(va) - diagm(diag(va))
-    nd_vc = copy(vc) - diagm(diag(vc))
-    nd_vd = copy(vd) - diagm(diag(vd))
-    return diag((Δd .* nd_va ./ ωs .^ 3) * nd_vc) + diag((nd_vd ./ ωs .^ 2)  * vvels[symb_to_ind(a)][symb_to_ind(c)])
-end
+ # note that the indices of F have been altered
+
+# function F_2(a, b, ωs, vels, vvels, QM_switch; which_mm = :orbital)   
+#     s = zeros(ComplexF64, size(ωs,1))
+#     for (c,d,sign) in allowed_components(a)
+#         s += -sign * aux_F(b, c, d, ωs, vels, vvels, QM_switch)
+#     end
+#     return s
+# end
+
+# function aux_F(b, c, d, ωs,vels, vvels, QM_switch)
+#     if QM_switch == true
+#         switch = 1
+#     else switch = 0 end
+#     vb = vels[symb_to_ind(b)]
+#     vc = vels[symb_to_ind(c)]
+#     vd = vels[symb_to_ind(d)]
+#     term1 = zeros(ComplexF64,size(vb,1))
+#     term2 = zeros(ComplexF64,size(vb,1))
+#     term3 = zeros(ComplexF64,size(vb,1))
+
+#     for n in 1:size(vb,1)
+#         for m in 1:size(vb,1)
+#             if n ≠ m
+#                 term1[n] +=  (2vc[n,n] + vc[m,m] + switch*(-vc[n,n] + vc[m,m]))/2 * (vd[n,m] * vb[m,n])/ ωs[n,m]^3
+#                 term2[n] +=  switch*vd[n,m] * vvels[symb_to_ind(b)][symb_to_ind(c)][m,n] / (2*ωs[n,m]^2)
+#                 for l in 1:size(vb,1)
+#                     if l ≠ n && l ≠ m
+#                         term3[n] += 0*vc[n,l] * vd[l,m] * vb[m,n]/ (ωs[l,m]* ωs[n,m]^2)
+#                     end
+#                 end
+#             else nothing end
+#         end
+#     end
+#     return term1 + term2 + term3
+# end
+
 
 """ interband magnetic moment with orbital and spin parts """
 function interband_MM(a,ωs, vels; which_mm = :orbital)
@@ -178,13 +255,17 @@ end
 interband_SMM(a, ωs, vels) = 0I #ignored for the moment
 #_________________________________________________________________________________________
 
-function contracted_sum_qm(a::Symbol, b::Symbol, c::Symbol)
-    s = 0.0
-    for d in [:x,:y,:z]
-        s += levi_civita(b, c, d) * partial_quantum_metric(c, d, a)
-    end
-    return s
-end
+# function contracted_sum_qm(a::Symbol, b::Symbol, c::Symbol)
+#     s = 0.0
+#     cords = [:x, :y, :z]
+#     d = setdiff(cords, (b,c))[1]  # only one element remains
+#     if (b,c,d) in [(:x,:y,:z), (:y,:z,:x), (:z,:x,:y)]
+#         sign = 1
+#     elseif (b,c,d) in [(:x,:z,:y), (:z,:y,:x), (:y,:x,:z)]
+#         sign = -1
+#     end
+#     s += sign * partial_quantum_metric(c, d, a)
+# end
 
 function levi_civita(i::Symbol, j::Symbol, k::Symbol)
     perm = (i, j, k)
@@ -230,12 +311,18 @@ function checkantisym(a,b,c)
 end
 
 function transform_k(us, Gs)
-    if length(us) == 3
+    if length(Gs) == 3
         return us[1]*Gs[1] + us[2]*Gs[2] + us[3]*Gs[3]
     else
         return us[1]*Gs[1] + us[2]*Gs[2]
     end
 end
     
-    
-    
+""" levi civita tensor selection pairs"""
+function allowed_components(a::Symbol)
+    pairs = Dict(
+    :x => [(:y,:z, 1), (:z,:y,-1)],
+    :y => [(:z,:x, 1), (:x,:z,-1)],
+    :z => [(:x,:y, 1), (:y,:x,-1)])
+    return pairs[a]
+end

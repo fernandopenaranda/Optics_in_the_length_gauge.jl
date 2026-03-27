@@ -21,10 +21,11 @@ Computes several spectral quantities and optical responses of general k-space Ha
 #### Transport
 
 + Drude intraband conductivity: $\sigma_{ij}^D = \frac{-e^2 \tau}{1- i\omega \tau}  \int \frac{d\vec k}{(2\pi)^d} f' v_i^0 v_j^0$
-+ Orbital contribution to the Linear Magnetoconductivity
++ Orbital contribution to the Linear Magnetoconductivity $\sigma_{ijk}$
 + Spin contribution to the Linear Magnetoconductivity
 + Anomalous Hall conductivity: $\sigma^{\text{QAH}}_{ij} = - \frac{e^2}{h} 2\pi \int_{n,k} f_0(\epsilon_{\boldsymbol k}^0 ) \epsilon_{i j k} \Omega_k$
-+ ...
++ Classical (Lorentz) contribution to $\sigma_{ijk} = \frac{-e^3}{\hbar} \int_k f_0' \tau v_i \epsilon_{lmk} v_m (\partial_l \tau v_j + \tau \partial_l v_j) -e^3 \int_k f_0'' \tau^2 v_i \epsilon_{lmk} v_m v_l v_j $ with $E_j$ and $B_k$
++ Quantum contribution (positional shift) to $\sigma_{ijk}$ with $E_j$ and $B_k$
   
 Input: the Hamiltonian $H(\vec{k})$, its gradient $\nabla_{\vec{k}} H(\vec{k})$, and the Brillouin zone boundaries.
 

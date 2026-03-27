@@ -28,22 +28,24 @@ function interband_OMM(a, ωs, vels)
     s = zeros(ComplexF64, size(ωs,1), size(ωs,1))
     if length(vels) == 3
         cords = [:x,:y,:z]
-        for b in cords
-            for c in cords
-                s .+= levi_civita(a, b, c) .* omm_int(vels[symb_to_ind(b)], vels[symb_to_ind(c)], ωs)
-            end
+    else  
+        cords = [:x,:y] # it assumes the bounded direction is z and a and b are in the plane
+    end
+    for b in cords
+        for c in cords
+            s .+= levi_civita(a, b, c) .* omm_int(vels[symb_to_ind(b)], vels[symb_to_ind(c)], ωs)
         end
-    else 
-        s .=  omm_int(vels[1], vels[2], ωs)  .- omm_int(vels[2], vels[1], ωs)    
     end
     return  s
 end
 
 function omm_int(vb, vc, ωs)
-    ωs_safe = ωs .+ Diagonal(fill(Inf, size(ωs,1)))
+    ωs_safe = ωs #.+ Diagonal(fill(Inf, size(ωs,1)))
     vb_diag = diag(vb) # store the diagonal elements
     non_diagvb = copy(vb) - diagm(diag(vb))
     non_diagvc = copy(vc)- diagm(diag(vc))
     M = non_diagvb * (non_diagvc  ./ ωs_safe ) +  (vb_diag .+ vb_diag') .* (non_diagvc  ./ ωs_safe )
     return M .* (-1im/2)
 end
+
+

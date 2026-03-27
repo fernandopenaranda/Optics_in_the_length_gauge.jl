@@ -68,12 +68,15 @@ and p the presets compatible with such function
         ax = Axis(fig[1, 1], xlabel="kx [1/Å]", ylabel="ky [1/Å]", title = "uz =  [adimensional]")
         cmap = :grays  # CairoMakie built-in colormap, light-to-dark blues
         hm = surface!(ax, kx, ky, zeros(size(Z)),
-                    color=Z,
-                    shading=NoShading,
-                    colormap=cmap)
-        Colorbar(fig[1, 2], hm, label=label)
-        fig
+        color=Z,
+        shading=NoShading,
+        colormap=cmap,
+        colorrange=(-maximum(abs,Z), maximum(abs,Z)))
+    Colorbar(fig[1, 2], hm, label=label)
+    ylims!(ax, -2π-π/2, 2π+π/2)
     end
+
+
 """
 function k_mesh_eval(quantity, p, R1, R2, R3, c_symb::Symbol; u0 = 0,  botbounds = [-0.5,-0.5], topbounds = [0.5,0.5], kpoints = 100)
     Gs = dualbasis([R1,R2,R3])

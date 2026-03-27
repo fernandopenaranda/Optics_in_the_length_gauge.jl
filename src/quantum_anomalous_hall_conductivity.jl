@@ -51,9 +51,9 @@ function σij_anomalous_hall(p::AH_presets_3d)
     else length(p.gs) == 2
         VBZ = bz_volume(p.gs[1],p.gs[2])
     end
-    bz_vol = VBZ/(2pi*ang_to_m)^length(p.computation.xbounds) # is the a0 there?
+    bz_vol = VBZ/(2pi*ang_to_m)^length(p.computation.xbounds) 
     val = bz_integration_transport_3d(integrand, p.computation, p.gs, rel_tol = 1e-5, abs_tol = 1e-7)
-    return -2π * bz_vol * val # in units of e^2/h
+    return -2π * bz_vol * val * ang_to_m^2 # in units of e^2/h
 end
 
 function k_σij_anomalous_hall_3d(i,j,h,dh, T, gs)
@@ -64,7 +64,9 @@ function k_σij_anomalous_hall_3d(i,j,h,dh, T, gs)
     else length(gs) == 2
         vels = [v(:x,ψs,dh), v(:y,ψs,dh)]
     end
-    return sum([fn(ϵ, 0, T) for ϵ in ϵs] .*Ωab(i,j, ωs,vels) .* ang_to_m^2)
+    # return sum([fn(ϵ, 0, T) for ϵ in ϵs] .*Ωab(i,j, ωs,vels))
+    return sum([fn(ϵ, 0, T) for ϵ in ϵs] .*Ωab(i,j, ωs,vels))
+
 end
 
 
@@ -79,13 +81,16 @@ function Ωi(i, ωs, vels)
     coords = [:x,:y,:z]
     for j in coords
         for k in coords
-            s .+= levi_civita(i,j,k) .* Ωab(j,k, ωs ,vels)
+            s .+= levi_civita(i,j,k) .* Ωab(j,k, ωs ,vels) * 1/2
+             # the 1/2 cancels the two below that upon the contraction of the two indices
         end
     end
     return s
 end
 
 
+""" note that this formula (2d and 3d) works because the two epsilons are contracted no need for levicivita tensors
+(-2) comes out of the contraction ϵijk ϵkab = δia δjb - δib δja """
 function  Ωab(j,k, ωs ,vels)
     vj = vels[symb_to_ind(j)]
     vk = vels[symb_to_ind(k)]

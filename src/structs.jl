@@ -120,6 +120,21 @@ end
     epsilon::Float64
 end
 
+@with_kw struct Classical_σijk_antisym{GS, H, DH, DDH} 
+    #valid in 3d only
+    dirJ::Symbol # i'th direction of σijk
+    dirE::Symbol # j'th direction of σijk
+    dirB::Symbol # k'th direction of σijk
+    h::H # Hamiltonian H(k)
+    nabla_h::DH # ∇_k H(k)
+    nabla_nabla_h::DDH 
+    gs::GS # reciprocal lattice vectors
+    τ::Float64 # scattering time in seconds
+    T::Float64 # Temperature in K
+    computation::Union{Optical_computation_presets, Transport_computation_presets, Transport_computation_3d_presets}
+    fermi_surface::Bool
+end
+
 @with_kw struct Planar_σijk_presets_spin
     s_op::Union{Array, UniformScaling}  # array of spin operator [σx, σy, σz] matrix representations
     p::Planar_σijk_presets_orbital

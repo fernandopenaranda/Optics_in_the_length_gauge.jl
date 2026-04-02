@@ -79,6 +79,7 @@ function integrand_quantum_contribution(a, b, c, ϵs, ψs, dh, ddh, T, Ω_MM_swi
     ϵ = kB*T
     ωs = Ω(ϵs) .+ 0im 
     ωs[real(ωs) .< 1e-4] .+= im*ϵ
+    s = 0.0im
     if length(dh) == 3
         vels = [v(:x,ψs,dh), v(:y,ψs,dh), v(:z,ψs,dh)]  #units [E*L]
         vvels = d_3dvs(ψs, ddh)
@@ -86,11 +87,20 @@ function integrand_quantum_contribution(a, b, c, ϵs, ψs, dh, ddh, T, Ω_MM_swi
         vels = [v(:x,ψs,dh), v(:y,ψs,dh)]  #units [E*L]
         vvels = d_2dvs(ψs, ddh)
     end
+    df = d_f(ϵs, 0, T)
     if fermi_surface == false
-        return real(sum(d_f(ϵs, 0, T) .* (ifelse(PS_switch == true, 1, 0) .* 
-            positional_shift(a, b, c, ωs, vels, vvels, QM_switch, which_mm = which_mm) .+ 
-            ifelse(Ω_MM_switch == true, 1, 0) .* berry_OMM(a,b,c, ωs, vels, which_mm = which_mm))))
+        if PS_switch == true
+            s += sum(df .* positional_shift(a, b, c, ωs, vels, vvels, QM_switch, which_mm = which_mm))
+        end
+        if Ω_MM_switch == true
+            s += sum(df .* berry_OMM(a,b,c, ωs, vels, which_mm = which_mm))
+        end
+        return real(s)
+        # return real(sum(d_f(ϵs, 0, T) .* (ifelse(PS_switch == true, 1, 0) .* 
+        #     positional_shift(a, b, c, ωs, vels, vvels, QM_switch, which_mm = which_mm) .+ 
+        #     ifelse(Ω_MM_switch == true, 1, 0) .* berry_OMM(a,b,c, ωs, vels, which_mm = which_mm))))
     else 
+        # throw(ArgumentError(""))
         return real(sum(-d_f(ϵs, 0, T))) # DOS
     end
 end
@@ -124,7 +134,6 @@ function positional_shift(a, b, c, ωs, vels, vvels, QM_switch; which_mm = :orbi
  function F(a, b, ωs, vels, vvels, QM_switch; which_mm = :orbital)   
     va = vels[symb_to_ind(a)]
     nd_va = copy(va) - diagm(diag(va))
-
     vb = vels[symb_to_ind(b)]
     nd_vb = copy(vb) - diagm(diag(vb))
     dim =  size(ωs,1)

@@ -44,8 +44,8 @@ function omm_int(vb, vc, ωs)
     vb_diag = diag(vb) # store the diagonal elements
     non_diagvb = copy(vb) - diagm(diag(vb))
     non_diagvc = copy(vc)- diagm(diag(vc))
-    M = non_diagvb * (non_diagvc  ./ ωs_safe ) +  (vb_diag .+ vb_diag') .* (non_diagvc  ./ ωs_safe )
-    return 0* M .* (-1im/2)
+    M = 0* non_diagvb * (non_diagvc  ./ ωs_safe ) +  (vb_diag .+ vb_diag') .* (non_diagvc  ./ ωs_safe )
+    return  M .* (-1im/2)
 end
 
 

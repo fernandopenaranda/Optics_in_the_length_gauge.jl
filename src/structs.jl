@@ -115,6 +115,7 @@ end
     which_mm::Symbol # which magnetic moment (spin orbital or both). Orbital only by default
     Ω_MM_switch = true # Omega_MM contribution
     PS_switch = true  # Positional Shift contribution
+    PS_orbital_switch # Orbital contribution to the positional shift
     QM_switch = true # Quantum metric contribution to the positional shift
     fermi_surface::Bool
     epsilon::Float64

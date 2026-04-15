@@ -42,7 +42,8 @@ computes the out-of-plane component of the Berry curvature given by
 which_ind(i::Symbol) = i == :x ? 1 : 2
 #_________________________________________________________________________________________
 
-""" valid for 2d and 3d"""
+""" valid for 2d and 3d. 
+units of in units of e^2/h * 1/L^d-2 (provided in angstroms this time)"""
 function σij_anomalous_hall(p::AH_presets_3d) 
     warn_equalargs(p.dirJ, p.dirE)
     integrand(q) = k_σij_anomalous_hall_3d(p.dirJ, p.dirE, p.h(q), p.dh(q), p.T, p.gs)
@@ -53,7 +54,7 @@ function σij_anomalous_hall(p::AH_presets_3d)
     end
     bz_vol = VBZ/(2pi)^length(p.computation.xbounds) 
     val = bz_integration_transport_3d(integrand, p.computation, p.gs, rel_tol = 1e-5, abs_tol = 1e-7)
-    return -2π * bz_vol * val / ang_to_m^(length(p.gs)-2) # in units of e^2/h * 1/L^d-2
+    return -2π * bz_vol * val  # in units of e^2/h * 1/L^d-2
 end
 
 function k_σij_anomalous_hall_3d(i,j,h,dh, T, gs)

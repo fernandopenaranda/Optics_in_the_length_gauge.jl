@@ -51,9 +51,9 @@ function σij_anomalous_hall(p::AH_presets_3d)
     else length(p.gs) == 2
         VBZ = bz_volume(p.gs[1],p.gs[2])
     end
-    bz_vol = VBZ/(2pi*ang_to_m)^length(p.computation.xbounds) 
+    bz_vol = VBZ/(2pi)^length(p.computation.xbounds) 
     val = bz_integration_transport_3d(integrand, p.computation, p.gs, rel_tol = 1e-5, abs_tol = 1e-7)
-    return -2π * bz_vol * val * ang_to_m^2 # in units of e^2/h
+    return -2π * bz_vol * val / ang_to_m^(length(p.gs)-2) # in units of e^2/h * 1/L^d-2
 end
 
 function k_σij_anomalous_hall_3d(i,j,h,dh, T, gs)

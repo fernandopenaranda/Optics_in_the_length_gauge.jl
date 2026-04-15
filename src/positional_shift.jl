@@ -48,6 +48,7 @@ function quantum_contribution(a0, dirJ, dirE, dirB, h, dh, ddh, Gs, τ, T, cpt, 
     
     return  val * ecube_hbarsquared * ang_to_m #units of S/m/T
 end
+
 "there is also a contribution coming from the spin magnetic moment (path disabled for the moment)
 f' * ∑_α (v_a F_{bc}^α - v_b F_{ac}^α + ϵ_{abd}Omega_d M_c^α).
 Important not to confuse"

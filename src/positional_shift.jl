@@ -127,11 +127,11 @@ shift contribution F """
 function positional_shift(a, b, c, ωs, vels, vvels, PS_orbital_switch, QM_switch; which_mm = :orbital) 
     va = vels[symb_to_ind(a)]
     vb = vels[symb_to_ind(b)]
-    return diag(va) .* F(c, b, ωs, vels, vvels, QM_switch, which_mm = which_mm) .- 
-        diag(vb) .* F(c, a, ωs, vels, vvels, QM_switch, which_mm = which_mm) 
+    return diag(va) .* F(c, b, ωs, vels, vvels, PS_orbital_switch, QM_switch, which_mm = which_mm) .- 
+        diag(vb) .* F(c, a, ωs, vels, vvels, PS_orbital_switch, QM_switch, which_mm = which_mm) 
  end
 
-function F(a, b, ωs, vels, vvels, QM_switch; which_mm = :orbital)   
+function F(a, b, ωs, vels, vvels, PS_orbital_switch, QM_switch; which_mm = :orbital)   
     vb = vels[symb_to_ind(b)]
     nd_vb = copy(vb) - diagm(diag(vb))
     dim =  size(ωs,1)

@@ -195,7 +195,7 @@ function F(p::Quantum_correction_σijk_antisym, q,a,b)
     ωs_epsilon[real(ωs_epsilon) .< 1e-5] .+=  im*ϵ # this is to avoid divergences at band crossings.
     vels = [v(:x,ψs,dhs), v(:y,ψs,dhs), v(:z,ψs,dhs)]  #units [E*L]
     vvels = d_3dvs(ψs, ddhs) #units [E*L^2]
-    return real.(F(a, b, ωs_epsilon, vels, vvels, p.QM_switch; which_mm = :orbital)) #.* real.(diag(vels[1])) # the commented is only for rapid access to vi fij do not consider it seriously
+    return real.(F(a, b, ωs_epsilon, vels, vvels, p.PS_orbital_switch, p.QM_switch; which_mm = :orbital)) #.* real.(diag(vels[1])) # the commented is only for rapid access to vi fij do not consider it seriously
 end
 
 """ interband magnetic moment with orbital and spin parts """

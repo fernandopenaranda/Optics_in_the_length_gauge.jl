@@ -39,13 +39,32 @@ function interband_OMM(a, ωs, vels)
     return  s
 end
 
+# function omm_int(vb, vc, ωs)
+#     ωs_safe = ωs #.+ Diagonal(fill(Inf, size(ωs,1)))
+#     vb_diag = diag(vb) # store the diagonal elements
+#     non_diagvb = copy(vb) - diagm(diag(vb))
+#     non_diagvc = copy(vc)- diagm(diag(vc))
+#     M = non_diagvb * (non_diagvc  ./ ωs_safe ) +  (vb_diag .+ vb_diag') .* (non_diagvc  ./ ωs_safe )
+#     return  M .* (-1im/2)
+# end
+
 function omm_int(vb, vc, ωs)
-    ωs_safe = ωs #.+ Diagonal(fill(Inf, size(ωs,1)))
-    vb_diag = diag(vb) # store the diagonal elements
-    non_diagvb = copy(vb) - diagm(diag(vb))
-    non_diagvc = copy(vc)- diagm(diag(vc))
-    M = non_diagvb * (non_diagvc  ./ ωs_safe ) +  (vb_diag .+ vb_diag') .* (non_diagvc  ./ ωs_safe )
-    return  M .* (-1im/2)
+    ωs_safe = ωs
+    dim = size(ωs, 1)
+    M = zeros(ComplexF64, dim, dim)
+    
+    for n in 1:dim
+        for m in 1:dim
+            if n ≠ m
+                for l in 1:dim
+                    if l ≠ n && l ≠ m
+                         M[m,n] = vb[m,l] * (vc[l,n] / ωs_safe[l,n] ) +  (vb[n,n] + vb[m,m]) * (vc[m,n] / ωs_safe[m,n] )
+       
+                    end
+                end
+            end
+        end
+    end
+    
+    return M .* (-1im/2)
 end
-
-

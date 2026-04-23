@@ -106,6 +106,28 @@ function integrand_quantum_contribution(a, b, c, ϵs, ψs, dh, ddh, T, Ω_MM_swi
     end
 end
 
+"""
+anomalous spin and orbital polarizability. Default only P see the definition of MM(which=:orbital)
+dh = [∂x h, ∂y h, ∂z h]
+ddh =  [[∂x∂x h, ∂x∂y h, ∂x∂z h], [∂y∂x h, ∂y∂y h, ∂y∂z h], [∂z∂x h, ∂z∂y h, ∂z∂z h]]
+alternative return (slower) but equivalent:
+    # return 2*real.(diag(va * (interband_MM(b, ωs, vels, which_mm = which_mm) ./ (ωs .^2))))  
+        + 0 .* 1/2 * real(contracted_sum_qm(a, b, ωs, vels, vvels))
+"""
+function F(p::Quantum_correction_σijk_antisym, q,a,b)
+    ϵs, ψs = eigen(Matrix(p.h(q)))   
+    dhs = [p.nabla_h(q)[1],p.nabla_h(q)[2],p.nabla_h(q)[3]]
+    ddhs = [[p.nabla_nabla_h(q)[1][1],p.nabla_nabla_h(q)[1][2],p.nabla_nabla_h(q)[1][3]], 
+        [p.nabla_nabla_h(q)[2][1],p.nabla_nabla_h(q)[2][2],p.nabla_nabla_h(q)[2][3]],
+        [p.nabla_nabla_h(q)[3][1],p.nabla_nabla_h(q)[3][2],p.nabla_nabla_h(q)[3][3]]]
+    ϵ = kB*p.T
+    ωs_epsilon = Ω(ϵs) .+ 0im 
+    ωs_epsilon[real(ωs_epsilon) .< 1e-5] .+=  im*ϵ # this is to avoid divergences at band crossings.
+    vels = [v(:x,ψs,dhs), v(:y,ψs,dhs), v(:z,ψs,dhs)]  #units [E*L]
+    vvels = d_3dvs(ψs, ddhs) #units [E*L^2]
+    return real.(F(a, b, ωs_epsilon, vels, vvels, p.PS_orbital_switch, p.QM_switch; which_mm = :orbital)) #.* real.(diag(vels[1])) # the commented is only for rapid access to vi fij do not consider it seriously
+end
+
 d_2dvs(ψs, ddh) = [[dv(:x, :x, ψs, ddh), dv(:x, :y, ψs, ddh)],
     [dv(:y, :x, ψs, ddh), dv(:y, :y, ψs, ddh)]] 
 
@@ -177,27 +199,7 @@ function qm_int(a, c, d, ωs, vels, vvels)
         diag((nd_vd ./ ωs_safe .^ 2)  * vvels[symb_to_ind(a)][symb_to_ind(c)])
 end
 
-"""
-anomalous spin and orbital polarizability. Default only P see the definition of MM(which=:orbital)
-dh = [∂x h, ∂y h, ∂z h]
-ddh =  [[∂x∂x h, ∂x∂y h, ∂x∂z h], [∂y∂x h, ∂y∂y h, ∂y∂z h], [∂z∂x h, ∂z∂y h, ∂z∂z h]]
-alternative return (slower) but equivalent:
-    # return 2*real.(diag(va * (interband_MM(b, ωs, vels, which_mm = which_mm) ./ (ωs .^2))))  
-        + 0 .* 1/2 * real(contracted_sum_qm(a, b, ωs, vels, vvels))
-"""
-function F(p::Quantum_correction_σijk_antisym, q,a,b)
-    ϵs, ψs = eigen(Matrix(p.h(q)))   
-    dhs = [p.nabla_h(q)[1],p.nabla_h(q)[2],p.nabla_h(q)[3]]
-    ddhs = [[p.nabla_nabla_h(q)[1][1],p.nabla_nabla_h(q)[1][2],p.nabla_nabla_h(q)[1][3]], 
-        [p.nabla_nabla_h(q)[2][1],p.nabla_nabla_h(q)[2][2],p.nabla_nabla_h(q)[2][3]],
-        [p.nabla_nabla_h(q)[3][1],p.nabla_nabla_h(q)[3][2],p.nabla_nabla_h(q)[3][3]]]
-    ϵ = kB*p.T
-    ωs_epsilon = Ω(ϵs) .+ 0im 
-    ωs_epsilon[real(ωs_epsilon) .< 1e-5] .+=  im*ϵ # this is to avoid divergences at band crossings.
-    vels = [v(:x,ψs,dhs), v(:y,ψs,dhs), v(:z,ψs,dhs)]  #units [E*L]
-    vvels = d_3dvs(ψs, ddhs) #units [E*L^2]
-    return real.(F(a, b, ωs_epsilon, vels, vvels, p.PS_orbital_switch, p.QM_switch; which_mm = :orbital)) #.* real.(diag(vels[1])) # the commented is only for rapid access to vi fij do not consider it seriously
-end
+
 
 """ interband magnetic moment with orbital and spin parts """
 function interband_MM(a,ωs, vels; which_mm = :orbital)

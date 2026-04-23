@@ -55,9 +55,10 @@ function omm_int(vb, vc, ωs) # Equivalent
     for n in 1:dim
         for m in 1:dim
             if n ≠ m
+                M[m,n] += (vb[n,n] + vb[m,m]) * (vc[m,n] / ωs_safe[m,n] )
                 for l in 1:dim
                     if l ≠ n && l ≠ m
-                         M[m,n] += vb[m,l] * (vc[l,n] / ωs_safe[l,n] ) +  (vb[n,n] + vb[m,m]) * (vc[m,n] / ωs_safe[m,n] )
+                         M[m,n] += vb[m,l] * (vc[l,n] / ωs_safe[l,n] )
        
                     end
                 end

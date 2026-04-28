@@ -79,7 +79,7 @@ function integrand_quantum_contribution(a, b, c, ϵs, ψs, dh, ddh, T, Ω_MM_swi
     PS_switch, PS_orbital_switch, QM_switch, which_mm, fermi_surface, ϵ = 1e-5)
     ϵ = kB*T
     ωs = Ω(ϵs) .+ 0im 
-    ωs[real(ωs) .< 1e-4] .+= im*ϵ
+    ωs[real(ωs) .< 1e-4] .+= im*ϵ # BROADENING TAKE IT INTO ACCOUNT
     s = 0.0im
     if length(dh) == 3
         vels = [v(:x,ψs,dh), v(:y,ψs,dh), v(:z,ψs,dh)]  #units [E*L]
@@ -122,7 +122,7 @@ function F(p::Quantum_correction_σijk_antisym, q,a,b)
         [p.nabla_nabla_h(q)[3][1],p.nabla_nabla_h(q)[3][2],p.nabla_nabla_h(q)[3][3]]]
     ϵ = kB*p.T
     ωs_epsilon = Ω(ϵs) .+ 0im 
-    # ωs_epsilon[real(ωs_epsilon) .< 1e-5] .+=  im*ϵ # this is to avoid divergences at band crossings.
+    ωs_epsilon[real(ωs_epsilon) .< 1e-5] .+=  im*ϵ # this is to avoid divergences at band crossings.
     vels = [v(:x,ψs,dhs), v(:y,ψs,dhs), v(:z,ψs,dhs)]  #units [E*L]
     vvels = d_3dvs(ψs, ddhs) #units [E*L^2]
     return real.(F(a, b, ωs_epsilon, vels, vvels, p.PS_orbital_switch, p.QM_switch; which_mm = :orbital)) #.* real.(diag(vels[1])) # the commented is only for rapid access to vi fij do not consider it seriously

@@ -117,14 +117,11 @@ function fn(ϵn, μ, T)
 end
 # first derivative with respect to E
 d_f(ϵs, μ, T) = [d_fn(ϵn, μ, T) for ϵn in ϵs]
-
-
 function d_fn(ϵn, μ, T) # this if for tbg
     η = π * kB*T
     # return (-1/π * η) / ((μ - ϵn) ^2 + η^2) # lorentzian fastest convergency RHG.
     return -1/(kB*T) * fn(ϵn, μ, T) * (1-fn(ϵn, μ, T)) # TBG
-end 
-
+end
 # function d_fn(ϵn, μ, T) # this is for RHG
 #     # if T === 0
 #     η = π * kB*T

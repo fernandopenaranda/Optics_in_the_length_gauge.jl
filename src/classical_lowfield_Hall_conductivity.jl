@@ -18,6 +18,7 @@
 
 function classical_contribution_sigmaijk(dirJ, dirE, dirB, h, dh, ddh, Gs, 
     τ, T, cpt, fermi_surface, rel_tol = 1e-5, abs_tol = 0)
+    checkperiodicity(dirJ, dirE, dirB, cpt)
     # checkdims(cpt.xbounds)
     checkantisym(dirJ,dirE,dirB)
     integrand(q) = integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
@@ -40,12 +41,25 @@ function integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, dd
     if fermi_surface == true
         s += sum(-df)
     else 
+        if length(q) == 3
+
         dhs = [dh(q)[1],dh(q)[2],dh(q)[3]]
         ddhs = [[ddh(q)[1][1],ddh(q)[1][2],ddh(q)[1][3]], 
         [ddh(q)[2][1],ddh(q)[2][2],ddh(q)[2][3]],
         [ddh(q)[3][1],ddh(q)[3][2],ddh(q)[3][3]]]
         vels = [v(:x,ψs,dhs), v(:y,ψs,dhs), v(:z,ψs,dhs)]  #units [E*L]
         vvels = d_3dvs(ψs, ddhs)
+
+    else length(q) == 2
+        ϵs, ψs = eigen(Matrix(h(q)))   
+        dhs = [dh(q)[1],dh(q)[2]]
+        auxmat = zeros(size(dhs[1],1), size(dhs[1],2))
+        ddhs = [[ddh(q)[1][1],ddh(q)[1][2], auxmat], 
+                [ddh(q)[2][1],ddh(q)[2][2], auxmat], 
+                [auxmat,auxmat,auxmat]]
+        vels = [v(:x,ψs,dhs), v(:y,ψs,dhs), auxmat]  #units [E*L]
+        vvels = d_3dvs(ψs, ddhs)
+    end
         s += sum(df .* classical_contribution_q(dirJ, dirE, dirB,ϵs,vels,vvels))
         end
     return real(s)
@@ -60,3 +74,9 @@ function classical_contribution_q(a,b,c,ϵs,vs,vvs)
 end
 
 ccq(a,b,l,m,vs,vvs) = diag(vs[m]) .* (diag(vvs[b][m]) .* diag(vs[a]) .- diag(vvs[a][l]) .* diag(vs[b]))
+
+function checkperiodicity(dirJ, dirE, dirB, cpt)
+    if length(cpt.xbounds) < 3
+        @warn "Molecular limit expressions not yet implemented. All z velocities are zero 2d limit. Not suited for quasi-2d materials"
+    end
+end

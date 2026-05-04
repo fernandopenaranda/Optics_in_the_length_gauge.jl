@@ -30,25 +30,24 @@ end
 
 
 function integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
-    ϵs, ψs = eigen(Matrix(h(q)))   
-    dhs = [dh(q)[1],dh(q)[2],dh(q)[3]]
-    ddhs = [[ddh(q)[1][1],ddh(q)[1][2],ddh(q)[1][3]], 
-           [ddh(q)[2][1],ddh(q)[2][2],ddh(q)[2][3]],
-           [ddh(q)[3][1],ddh(q)[3][2],ddh(q)[3][3]]]
+    ϵs, ψs = eigen(Matrix(h(q)))
     ϵ = kB*T
     ωs = Ω(ϵs) .+ 0im 
     ωs[real(ωs) .< 1e-4] .+= im*ϵ
     df = d_f(ϵs, 0, T)
-    s = 0.0im
+    s = 0.0im   
+    
     if fermi_surface == true
         s += sum(-df)
     else 
-        
-
+        dhs = [dh(q)[1],dh(q)[2],dh(q)[3]]
+        ddhs = [[ddh(q)[1][1],ddh(q)[1][2],ddh(q)[1][3]], 
+        [ddh(q)[2][1],ddh(q)[2][2],ddh(q)[2][3]],
+        [ddh(q)[3][1],ddh(q)[3][2],ddh(q)[3][3]]]
         vels = [v(:x,ψs,dhs), v(:y,ψs,dhs), v(:z,ψs,dhs)]  #units [E*L]
         vvels = d_3dvs(ψs, ddhs)
         s += sum(df .* classical_contribution_q(dirJ, dirE, dirB,ϵs,vels,vvels))
-    end
+        end
     return real(s)
 end
 

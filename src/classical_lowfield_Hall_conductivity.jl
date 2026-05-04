@@ -18,7 +18,7 @@
 
 function classical_contribution_sigmaijk(dirJ, dirE, dirB, h, dh, ddh, Gs, 
     τ, T, cpt, fermi_surface, rel_tol = 1e-5, abs_tol = 0)
-    checkdims(cpt.xbounds)
+    # checkdims(cpt.xbounds)
     checkantisym(dirJ,dirE,dirB)
     integrand(q) = integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
     integrator(observable) = bz_integration_transport_3d(observable, cpt, Gs, rel_tol = rel_tol, abs_tol = abs_tol)
@@ -27,6 +27,7 @@ function classical_contribution_sigmaijk(dirJ, dirE, dirB, h, dh, ddh, Gs,
                                           # yielding the e^3/hbar^4
     return  val * ecube_hbarfour/2* ang_to_m * τ^2 * fs_to_s^2 #units of S/m/T, tau must be in seconds
 end
+
 
 function integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
     ϵs, ψs = eigen(Matrix(h(q)))   

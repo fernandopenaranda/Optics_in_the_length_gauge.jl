@@ -32,7 +32,7 @@ end
 
 integrand_classical_contribution_sigmaijk_q(p::Classical_σijk_antisym, q) = 
     integrand_classical_contribution_sigmaijk_q(p.dirJ, p.dirE, p.dirB, p.h, p.nabla_h, p.nabla_nabla_h, p.T, q, p.fermi_surface)
-    
+
 function integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
     s = zeros(ComplexF64, 4)
     icc_eval!(s, dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
@@ -45,7 +45,7 @@ function icc_eval!(s, dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
     ωs = Ω(ϵs) .+ 0im 
     ωs[real(ωs) .< 1e-4] .+= im*ϵ
     df = d_f(ϵs, 0, T)
-    vels, vvels = set_vels(q, dh, ddh, ψs)
+    vels, vvels = set_vels(q, h, dh, ddh, ψs)
     if fermi_surface == true
         s .+= -df
     else 
@@ -64,7 +64,7 @@ function spin_pol_integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, 
     return real(sum(s .* spinprojection))
 end
 
-function set_vels(q, dh, ddh, ψs)
+function set_vels(q, h, dh, ddh, ψs)
     if length(q) == 3
         dhs = [dh(q)[1],dh(q)[2],dh(q)[3]]
         ddhs = [[ddh(q)[1][1],ddh(q)[1][2],ddh(q)[1][3]], 

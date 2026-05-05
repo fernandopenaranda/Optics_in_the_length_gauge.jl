@@ -52,7 +52,7 @@ module Optics_in_the_length_gauge
     #...
     export Optical_computation_presets, Transport_computation_presets, DOS_presets, JDOS_presets, σij_presets, Drude_presets, AH_presets, AH_presets_3d, Planar_σijk_presets_orbital, Planar_σijk_presets_spin, Quantum_correction_σijk_antisym, OMM_presets, Classical_σijk_antisym
     export dos, jdos, filling, expected_value, linear_optical_conductivity, drude_conductivity, σij_anomalous_hall, linear_magneto_conductivity_orbital, linear_magneto_conductivity_spin, linear_magneto_conductivity, positional_shift, F, interband_OMM
-    export bz_integration_transport_3d, Transport_computation_3d_presets, quantum_contribution, k_mesh_eval, classical_contribution_sigmaijk
+    export bz_integration_transport_3d, Transport_computation_3d_presets, quantum_contribution, k_mesh_eval, classical_contribution_sigmaijk, spin_pol_integrand_classical_contribution_sigmaijk_q
     # Export the presets submodule
     export Presets 
     include("presets/MLG_ham.jl") 

@@ -33,6 +33,13 @@ end
 integrand_classical_contribution_sigmaijk_q(p::Classical_σijk_antisym, q) = 
 integrand_classical_contribution_sigmaijk_q(p.dirJ, p.dirE, p.dirB, p.h, p.nabla_h, p.nabla_nabla_h, p.T, q, p.fermi_surface)
 
+function spin_pol_integrand_classical_contribution_sigmaijk_q(p::Classical_σijk_antisym, q)
+    s = integrand_classical_contribution_sigmaijk_q(p::Classical_σijk_antisym, q)
+    ϵs, ψs = eigen(Matrix(p.h(q)))
+    spinprojection = ψs' * [1, 1, -1, -1] * ψs
+    return s*spinprojection
+end
+
 function integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
     ϵs, ψs = eigen(Matrix(h(q)))
     ϵ = kB*T

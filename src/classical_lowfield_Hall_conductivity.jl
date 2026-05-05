@@ -24,11 +24,14 @@ function classical_contribution_sigmaijk(dirJ, dirE, dirB, h, dh, ddh, Gs,
     integrand(q) = integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
     integrator(observable) = bz_integration_transport_3d(observable, cpt, Gs, rel_tol = rel_tol, abs_tol = abs_tol)
     bz_vol = bz_volume(Gs)/(2pi)^length(cpt.xbounds)             # No a0 in the denominator
-    val = bz_vol * integrator(integrand)  # This has units of eV^2s^2*L we need this to have units of L/TE, so three hbars dividing
+    val = bz_vol * integrator(integrand)  # This has units of eV^2s^2*L we need this to have units of L/TE in 3d, so three hbars dividing
                                           # yielding the e^3/hbar^4
-    return  val * ecube_hbarfour/2* ang_to_m * τ^2 * fs_to_s^2 #units of S/m/T, tau must be in seconds
+    return  val * ecube_hbarfour/2* ang_to_m^(abs(length(cpt.xbounds)-4)) * τ^2 * fs_to_s^2 #units of S/m/T in 3d, S/T in 2d, tau must be in seconds
 end
 
+
+integrand_classical_contribution_sigmaijk_q(p::Classical_σijk_antisym, q) = 
+integrand_classical_contribution_sigmaijk_q(p.dirJ, p.dirE, p.dirB, p.h, p.nabla_h, p.nabla_nabla_h, p.T, q, p.fermi_surface)
 
 function integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
     ϵs, ψs = eigen(Matrix(h(q)))
@@ -41,15 +44,13 @@ function integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, dd
     if fermi_surface == true
         s += sum(-df)
     else 
-        if length(q) == 3
-
+    if length(q) == 3
         dhs = [dh(q)[1],dh(q)[2],dh(q)[3]]
         ddhs = [[ddh(q)[1][1],ddh(q)[1][2],ddh(q)[1][3]], 
         [ddh(q)[2][1],ddh(q)[2][2],ddh(q)[2][3]],
         [ddh(q)[3][1],ddh(q)[3][2],ddh(q)[3][3]]]
         vels = [v(:x,ψs,dhs), v(:y,ψs,dhs), v(:z,ψs,dhs)]  #units [E*L]
         vvels = d_3dvs(ψs, ddhs)
-
     else length(q) == 2
         ϵs, ψs = eigen(Matrix(h(q)))   
         dhs = [dh(q)[1],dh(q)[2]]

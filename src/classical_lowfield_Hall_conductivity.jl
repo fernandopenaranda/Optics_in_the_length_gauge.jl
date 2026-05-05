@@ -31,26 +31,40 @@ end
 
 
 integrand_classical_contribution_sigmaijk_q(p::Classical_σijk_antisym, q) = 
-integrand_classical_contribution_sigmaijk_q(p.dirJ, p.dirE, p.dirB, p.h, p.nabla_h, p.nabla_nabla_h, p.T, q, p.fermi_surface)
-
-function spin_pol_integrand_classical_contribution_sigmaijk_q(p::Classical_σijk_antisym, q)
-    s = integrand_classical_contribution_sigmaijk_q(p::Classical_σijk_antisym, q)
-    ϵs, ψs = eigen(Matrix(p.h(q)))
-    spinprojection = real(ψs * diagm([1, 1, -1, -1]) * ψs')
-    return s*spinprojection
+    integrand_classical_contribution_sigmaijk_q(p.dirJ, p.dirE, p.dirB, p.h, p.nabla_h, p.nabla_nabla_h, p.T, q, p.fermi_surface)
+    
+function integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
+    s = zeros(ComplexF64, 4)
+    icc_eval!(s, dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
+    return real(sum(s))
 end
 
-function integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
+function icc_eval!(s, dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
     ϵs, ψs = eigen(Matrix(h(q)))
     ϵ = kB*T
     ωs = Ω(ϵs) .+ 0im 
     ωs[real(ωs) .< 1e-4] .+= im*ϵ
     df = d_f(ϵs, 0, T)
-    s = 0.0im   
-    
+    vels, vvels = set_vels(q, dh, ddh, ψs)
     if fermi_surface == true
-        s += sum(-df)
+        s .+= -df
     else 
+        s .+= df .* classical_contribution_q(dirJ, dirE, dirB,ϵs,vels,vvels)
+    end
+end
+
+spin_pol_integrand_classical_contribution_sigmaijk_q(p::Classical_σijk_antisym, q) = 
+spin_pol_integrand_classical_contribution_sigmaijk_q(p.dirJ, p.dirE, p.dirB, p.h, p.nabla_h, p.nabla_nabla_h, p.T, q, p.fermi_surface)
+
+function spin_pol_integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
+    s = zeros(ComplexF64, 4)
+    icc_eval!(s, dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
+    ϵs, ψs = eigen(Matrix(h(q)))
+    spinprojection = [real(ψs[:, i]' * diagm([1, 1, -1, -1]) * ψs[:, i]) for i in 1:4]
+    return real(sum(s .* spinprojection))
+end
+
+function set_vels(q, dh, ddh, ψs)
     if length(q) == 3
         dhs = [dh(q)[1],dh(q)[2],dh(q)[3]]
         ddhs = [[ddh(q)[1][1],ddh(q)[1][2],ddh(q)[1][3]], 
@@ -68,9 +82,7 @@ function integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, dd
         vels = [v(:x,ψs,dhs), v(:y,ψs,dhs), auxmat]  #units [E*L]
         vvels = d_3dvs(ψs, ddhs)
     end
-        s += sum(df .* classical_contribution_q(dirJ, dirE, dirB,ϵs,vels,vvels))
-        end
-    return real(s)
+    return vels, vvels
 end
 
 function classical_contribution_q(a,b,c,ϵs,vs,vvs)

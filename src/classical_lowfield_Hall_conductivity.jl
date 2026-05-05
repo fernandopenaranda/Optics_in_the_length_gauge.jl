@@ -36,7 +36,7 @@ integrand_classical_contribution_sigmaijk_q(p.dirJ, p.dirE, p.dirB, p.h, p.nabla
 function spin_pol_integrand_classical_contribution_sigmaijk_q(p::Classical_σijk_antisym, q)
     s = integrand_classical_contribution_sigmaijk_q(p::Classical_σijk_antisym, q)
     ϵs, ψs = eigen(Matrix(p.h(q)))
-    spinprojection = ψs' * diagm([1, 1, -1, -1]) * ψs
+    spinprojection = real(ψs * diagm([1, 1, -1, -1]) * ψs')
     return s*spinprojection
 end
 

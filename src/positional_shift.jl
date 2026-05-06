@@ -200,7 +200,6 @@ function qm_int(a, c, d, ωs, vels, vvels)
 end
 
 
-
 """ interband magnetic moment with orbital and spin parts """
 function interband_MM(a,ωs, vels; which_mm = :orbital)
     if which_mm == :orbital

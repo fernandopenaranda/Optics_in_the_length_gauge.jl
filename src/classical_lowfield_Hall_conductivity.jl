@@ -24,11 +24,9 @@ function classical_contribution_sigmaijk(dirJ, dirE, dirB, h, dh, ddh, Gs,
     integrand(q) = integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
     integrator(observable) = bz_integration_transport_3d(observable, cpt, Gs, rel_tol = rel_tol, abs_tol = abs_tol)
     bz_vol = bz_volume(Gs)/(2pi)^length(cpt.xbounds)             # No a0 in the denominator
-    val = bz_vol * integrator(integrand)  # This has units of eV^2s^2*L we need this to have units of L/TE in 3d, so three hbars dividing
-                                          # yielding the e^3/hbar^4
+    val = bz_vol * integrator(integrand)  # This has units of eV^2s^2*L we need this to have units of L/TE in 3d, so three hbars dividing # yielding the e^3/hbar^4
     return  val * ecube_hbarfour/2* ang_to_m^(abs(length(cpt.xbounds)-4)) * τ^2 * fs_to_s^2 #units of S/m/T in 3d, S/T in 2d, tau must be in seconds
 end
-
 
 integrand_classical_contribution_sigmaijk_q(p::Classical_σijk_antisym, q) = 
     integrand_classical_contribution_sigmaijk_q(p.dirJ, p.dirE, p.dirB, p.h, p.nabla_h, p.nabla_nabla_h, p.T, q, p.fermi_surface)
@@ -49,7 +47,9 @@ function icc_eval!(s, dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
     if fermi_surface == true
         s .+= -df
     else 
-        s .+= df .* classical_contribution_q(dirJ, dirE, dirB,ϵs,vels,vvels)
+        # s .+= df .* classical_contribution_q(dirJ, dirE, dirB,ϵs,vels,vvels)
+        s .+= classical_contribution_q(dirJ, dirE, dirB,ϵs,vels,vvels)
+
     end
 end
 

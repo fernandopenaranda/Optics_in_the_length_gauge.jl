@@ -47,9 +47,7 @@ function icc_eval!(s, dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
     if fermi_surface == true
         s .+= -df
     else 
-        # s .+= df .* classical_contribution_q(dirJ, dirE, dirB,ϵs,vels,vvels)
-        s .+= classical_contribution_q(dirJ, dirE, dirB,ϵs,vels,vvels)
-
+        s .+= df .* classical_contribution_q(dirJ, dirE, dirB,ϵs,vels,vvels)
     end
 end
 

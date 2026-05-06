@@ -21,11 +21,12 @@ function classical_contribution_sigmaijk(dirJ, dirE, dirB, h, dh, ddh, Gs,
     checkperiodicity(dirJ, dirE, dirB, cpt)
     # checkdims(cpt.xbounds)
     checkantisym(dirJ,dirE,dirB)
-    integrand(q) = integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
+    # integrand(q) = integrand_classical_contribution_sigmaijk_q(dirJ, dirE, dirB, h, dh, ddh,T, q, fermi_surface)
+    integrand(q) = 1
     integrator(observable) = bz_integration_transport_3d(observable, cpt, Gs, rel_tol = rel_tol, abs_tol = abs_tol)
     bz_vol = bz_volume(Gs)/(2pi)^length(cpt.xbounds)             # No a0 in the denominator
     val = bz_vol * integrator(integrand)  # This has units of eV^2s^2*L we need this to have units of L/TE in 3d, so three hbars dividing # yielding the e^3/hbar^4
-    return  val * ecube_hbarfour/2* ang_to_m^(abs(length(cpt.xbounds)-4)) * τ^2 * fs_to_s^2 #units of S/m/T in 3d, S/T in 2d, tau must be in seconds
+    return  val #* ecube_hbarfour/2* ang_to_m^(abs(length(cpt.xbounds)-4)) * τ^2 * fs_to_s^2 #units of S/m/T in 3d, S/T in 2d, tau must be in seconds
 end
 
 integrand_classical_contribution_sigmaijk_q(p::Classical_σijk_antisym, q) = 
